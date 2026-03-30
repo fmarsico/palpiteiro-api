@@ -1,0 +1,7 @@
+package com.caravela21.palpiteiro.api.infrastructure.persistence.repository;
+
+import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MatchRepository extends JpaRepository<MatchEntity, String> {
+}
