@@ -1,22 +1,32 @@
 package com.caravela21.palpiteiro.api.controller.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.OffsetDateTime;
 
 public record MatchDTO(
 
         String id,
 
-        @NotBlank(message = "Home team is mandatory")
-        String homeTeam,
+        @NotBlank(message = "Home team ID is mandatory")
+        String homeTeamId,
 
-        @NotBlank(message = "Away team is mandatory")
-        String awayTeam,
+        @NotBlank(message = "Away team ID is mandatory")
+        String awayTeamId,
 
-        @NotBlank(message = "Date is mandatory")
-        String date,
+        @NotNull(message = "Date is mandatory")
+        OffsetDateTime date,
 
-        MatchResultDTO result
+        @Valid
+        MatchResultDTO result,
+
+        @Valid
+        TeamDTO homeTeam,
+
+        @Valid
+        TeamDTO awayTeam
 
 ) {
 }
-

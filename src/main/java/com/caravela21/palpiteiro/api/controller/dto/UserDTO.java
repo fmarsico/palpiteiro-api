@@ -18,8 +18,10 @@ public record UserDTO(
         String lastname,
         @Email
         @NotBlank(message = "Email is mandatory")
+        @Size(max = 255, message = "Email can have at most 255 characters")
         String email,
         @URL(message = "Photo URL must be a valid URL")
+        @Size(max = 500, message = "Photo URL can have at most 500 characters")
         String photoUrl
 
 
