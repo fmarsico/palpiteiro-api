@@ -29,7 +29,4 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "owner")
     private List<PoolEntity> createdPools;
-
-    @ManyToMany(mappedBy = "participants")
-    private List<PoolEntity> joinedPools;
 }

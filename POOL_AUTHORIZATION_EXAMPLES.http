@@ -1,0 +1,265 @@
+### Exemplo de Fluxo Completo - Pool com Autorização
+
+## 1️⃣ Owner cria uma pool
+```http
+POST http://localhost:8080/pool
+Content-Type: application/json
+
+{
+  "name": "Copa do Mundo 2026",
+  "ownerId": "550e8400-e29b-41d4-a716-446655440000"
+}
+
+< HTTP/1.1 201 Created
+<
+< {
+<   "id": "550e8400-e29b-41d4-a716-446655440001",
+<   "name": "Copa do Mundo 2026",
+<   "ownerId": "550e8400-e29b-41d4-a716-446655440000"
+< }
+```
+
+## 2️⃣ Usuário 1 solicita entrada na pool
+```http
+POST http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/request-access
+Content-Type: application/json
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440002"
+}
+
+< HTTP/1.1 201 Created
+<
+< {
+<   "id": "550e8400-e29b-41d4-a716-446655440003",
+<   "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<   "userId": "550e8400-e29b-41d4-a716-446655440002",
+<   "userName": "João Silva",
+<   "status": "PENDING",
+<   "requestedAt": "2026-04-05T10:30:00Z",
+<   "approvedAt": null
+< }
+```
+
+## 3️⃣ Usuário 2 também solicita entrada
+```http
+POST http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/request-access
+Content-Type: application/json
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440004"
+}
+
+< HTTP/1.1 201 Created
+<
+< {
+<   "id": "550e8400-e29b-41d4-a716-446655440005",
+<   "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<   "userId": "550e8400-e29b-41d4-a716-446655440004",
+<   "userName": "Maria Santos",
+<   "status": "PENDING",
+<   "requestedAt": "2026-04-05T10:31:00Z",
+<   "approvedAt": null
+< }
+```
+
+## 4️⃣ Owner visualiza requisições pendentes
+```http
+GET http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/pending-requests?ownerId=550e8400-e29b-41d4-a716-446655440000
+
+< HTTP/1.1 200 OK
+<
+< [
+<   {
+<     "id": "550e8400-e29b-41d4-a716-446655440003",
+<     "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<     "userId": "550e8400-e29b-41d4-a716-446655440002",
+<     "userName": "João Silva",
+<     "status": "PENDING",
+<     "requestedAt": "2026-04-05T10:30:00Z",
+<     "approvedAt": null
+<   },
+<   {
+<     "id": "550e8400-e29b-41d4-a716-446655440005",
+<     "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<     "userId": "550e8400-e29b-41d4-a716-446655440004",
+<     "userName": "Maria Santos",
+<     "status": "PENDING",
+<     "requestedAt": "2026-04-05T10:31:00Z",
+<     "approvedAt": null
+<   }
+< ]
+```
+
+## 5️⃣ Owner aprova João
+```http
+POST http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/approve-member?ownerId=550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440002"
+}
+
+< HTTP/1.1 200 OK
+<
+< {
+<   "id": "550e8400-e29b-41d4-a716-446655440003",
+<   "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<   "userId": "550e8400-e29b-41d4-a716-446655440002",
+<   "userName": "João Silva",
+<   "status": "APPROVED",
+<   "requestedAt": "2026-04-05T10:30:00Z",
+<   "approvedAt": "2026-04-05T10:35:00Z"
+< }
+```
+
+## 6️⃣ Owner rejeita Maria
+```http
+POST http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/reject-member?ownerId=550e8400-e29b-41d4-a716-446655440000
+Content-Type: application/json
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440004"
+}
+
+< HTTP/1.1 200 OK
+<
+< {
+<   "id": "550e8400-e29b-41d4-a716-446655440005",
+<   "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<   "userId": "550e8400-e29b-41d4-a716-446655440004",
+<   "userName": "Maria Santos",
+<   "status": "REJECTED",
+<   "requestedAt": "2026-04-05T10:31:00Z",
+<   "approvedAt": null
+< }
+```
+
+## 7️⃣ Owner visualiza membros aprovados
+```http
+GET http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/members
+
+< HTTP/1.1 200 OK
+<
+< [
+<   {
+<     "id": "550e8400-e29b-41d4-a716-446655440003",
+<     "poolId": "550e8400-e29b-41d4-a716-446655440001",
+<     "userId": "550e8400-e29b-41d4-a716-446655440002",
+<     "userName": "João Silva",
+<     "status": "APPROVED",
+<     "requestedAt": "2026-04-05T10:30:00Z",
+<     "approvedAt": "2026-04-05T10:35:00Z"
+<   }
+< ]
+```
+
+## 8️⃣ João faz um palpite (sucesso - está aprovado)
+```http
+POST http://localhost:8080/prediction
+Content-Type: application/json
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440002",
+  "poolId": "550e8400-e29b-41d4-a716-446655440001",
+  "matchId": "550e8400-e29b-41d4-a716-446655440100",
+  "homeScore": 2,
+  "awayScore": 1
+}
+
+< HTTP/1.1 201 Created
+```
+
+## 9️⃣ Maria tenta fazer um palpite (falha - foi rejeitada)
+```http
+POST http://localhost:8080/prediction
+Content-Type: application/json
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440004",
+  "poolId": "550e8400-e29b-41d4-a716-446655440001",
+  "matchId": "550e8400-e29b-41d4-a716-446655440100",
+  "homeScore": 3,
+  "awayScore": 0
+}
+
+< HTTP/1.1 400 Bad Request
+<
+< {
+<   "message": "User is not an approved member of this pool"
+< }
+```
+
+## 🔟 Ranking mostra apenas owner e membros aprovados
+```http
+GET http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/ranking
+
+< HTTP/1.1 200 OK
+<
+< [
+<   {
+<     "rank": 1,
+<     "userId": "550e8400-e29b-41d4-a716-446655440000",
+<     "userName": "Owner Name",
+<     "totalPoints": 4,
+<     "exactHitsTotal": 1,
+<     "exactHitsGroupStage": 0,
+<     "exactHitsKnockout": 1
+<   },
+<   {
+<     "rank": 2,
+<     "userId": "550e8400-e29b-41d4-a716-446655440002",
+<     "userName": "João Silva",
+<     "totalPoints": 1,
+<     "exactHitsTotal": 0,
+<     "exactHitsGroupStage": 0,
+<     "exactHitsKnockout": 0
+<   }
+< ]
+```
+
+---
+
+## ⚠️ Casos de Erro
+
+### ❌ Usuário não aprovado tenta solicitar novamente
+```http
+POST http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/request-access
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440002"
+}
+
+< HTTP/1.1 400 Bad Request
+<
+< {
+<   "message": "User already has a membership request or is already a member of this pool"
+< }
+```
+
+### ❌ Usuário não-owner tenta aprovar
+```http
+POST http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/approve-member?ownerId=550e8400-e29b-41d4-a716-446655440999
+
+{
+  "userId": "550e8400-e29b-41d4-a716-446655440004"
+}
+
+< HTTP/1.1 403 Forbidden
+<
+< {
+<   "message": "Only the pool owner can approve membership requests"
+< }
+```
+
+### ❌ Usuário não-owner tenta ver requisições
+```http
+GET http://localhost:8080/pool/550e8400-e29b-41d4-a716-446655440001/pending-requests?ownerId=550e8400-e29b-41d4-a716-446655440999
+
+< HTTP/1.1 403 Forbidden
+<
+< {
+<   "message": "Only the pool owner can view membership requests"
+< }
+```
+

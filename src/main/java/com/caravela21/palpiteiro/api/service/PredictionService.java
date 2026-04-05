@@ -1,44 +1,34 @@
 package com.caravela21.palpiteiro.api.service;
 
 import com.caravela21.palpiteiro.api.controller.dto.PredictionDTO;
+import com.caravela21.palpiteiro.api.enums.PoolMembershipStatus;
 import com.caravela21.palpiteiro.api.exceptions.PredictionDeadlineExceededException;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PoolEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PredictionEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.UserEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.MatchRepository;
+import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.PoolMembershipRepository;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.PoolRepository;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.PredictionRepository;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PredictionService {
 
     private final PredictionRepository predictionRepository;
     private final UserRepository userRepository;
     private final PoolRepository poolRepository;
     private final MatchRepository matchRepository;
-
-    public PredictionService(
-            PredictionRepository predictionRepository,
-            UserRepository userRepository,
-            PoolRepository poolRepository,
-            MatchRepository matchRepository
-    ) {
-        this.predictionRepository = predictionRepository;
-        this.userRepository = userRepository;
-        this.poolRepository = poolRepository;
-        this.matchRepository = matchRepository;
-    }
+    private final PoolMembershipRepository poolMembershipRepository;
 
     @Transactional
     public PredictionDTO upsertPrediction(PredictionDTO predictionDTO) {
@@ -69,14 +59,16 @@ public class PredictionService {
     }
 
     private void validatePoolMembership(UserEntity user, PoolEntity pool) {
-        Set<String> participantIds = (pool.getParticipants() == null ? Collections.<UserEntity>emptyList() : pool.getParticipants())
-                .stream()
-                .map(UserEntity::getId)
-                .collect(Collectors.toSet());
-
+        // Verifica se é o owner da pool
         boolean isOwner = pool.getOwner() != null && pool.getOwner().getId().equals(user.getId());
-        if (!isOwner && !participantIds.contains(user.getId())) {
-            throw new IllegalArgumentException("User is not a participant of this pool");
+
+        // Verifica se é membro aprovado da pool
+        boolean isApprovedMember = poolMembershipRepository.findByPoolIdAndUserId(pool.getId(), user.getId())
+                .map(membership -> membership.getStatus().equals(PoolMembershipStatus.APPROVED))
+                .orElse(false);
+
+        if (!isOwner && !isApprovedMember) {
+            throw new IllegalArgumentException("User is not an approved member of this pool");
         }
     }
 

@@ -5,17 +5,16 @@ import com.caravela21.palpiteiro.api.exceptions.MissingUserIdException;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.UserEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.mapper.UserMapper;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @Transactional
     public UserDTO createUser(UserDTO userDTO) {

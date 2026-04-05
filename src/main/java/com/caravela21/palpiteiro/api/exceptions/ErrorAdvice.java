@@ -184,5 +184,11 @@ public class ErrorAdvice {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
     }
 
+    @ExceptionHandler(UnauthorizedPoolOperationException.class)
+    public ResponseEntity<?> handleUnauthorizedPoolOperationException(UnauthorizedPoolOperationException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+        LOGGER.error("UnauthorizedPoolOperationException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
+    }
 
 }

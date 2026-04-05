@@ -2,14 +2,18 @@ package com.caravela21.palpiteiro.api.service;
 
 import com.caravela21.palpiteiro.api.controller.dto.PoolRankingEntryDTO;
 import com.caravela21.palpiteiro.api.enums.MatchPhase;
+import com.caravela21.palpiteiro.api.enums.PoolMembershipStatus;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchResultEmbeddable;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PoolEntity;
+import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PoolMembershipEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PredictionEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.UserEntity;
+import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.PoolMembershipRepository;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.PoolRepository;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.PredictionRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,23 +23,16 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RankingService {
 
     private final PoolRepository poolRepository;
     private final PredictionRepository predictionRepository;
+    private final PoolMembershipRepository poolMembershipRepository;
     private final ScoringService scoringService;
-
-    public RankingService(
-            PoolRepository poolRepository,
-            PredictionRepository predictionRepository,
-            ScoringService scoringService
-    ) {
-        this.poolRepository = poolRepository;
-        this.predictionRepository = predictionRepository;
-        this.scoringService = scoringService;
-    }
 
     @Transactional(readOnly = true)
     public List<PoolRankingEntryDTO> getPoolRanking(String poolId) {
@@ -44,9 +41,18 @@ public class RankingService {
 
         Map<String, RankingAccumulator> rankingMap = new HashMap<>();
 
+        // Adiciona o owner da pool
         addUserToRankingMap(rankingMap, pool.getOwner());
-        (pool.getParticipants() == null ? Collections.<UserEntity>emptyList() : pool.getParticipants())
-                .forEach(participant -> addUserToRankingMap(rankingMap, participant));
+
+        // Adiciona membros aprovados da pool
+        List<PoolMembershipEntity> approvedMembers = poolMembershipRepository.findByPoolId(poolId)
+                .stream()
+                .filter(m -> m.getStatus().equals(PoolMembershipStatus.APPROVED))
+                .collect(Collectors.toList());
+
+        for (PoolMembershipEntity membership : approvedMembers) {
+            addUserToRankingMap(rankingMap, membership.getUser());
+        }
 
         List<PredictionEntity> predictions = predictionRepository.findByPoolId(poolId);
         for (PredictionEntity prediction : predictions) {

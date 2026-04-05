@@ -5,20 +5,18 @@ import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.TeamEntit
 import com.caravela21.palpiteiro.api.infrastructure.persistence.mapper.TeamMapper;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.TeamRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TeamService {
 
-    @Autowired
-    private TeamRepository teamRepository;
-
-    @Autowired
-    private TeamMapper teamMapper;
+    private final TeamRepository teamRepository;
+    private final TeamMapper teamMapper;
 
     @Transactional
     public TeamDTO createTeam(TeamDTO teamDTO) {
@@ -64,4 +62,3 @@ public class TeamService {
                 .toList();
     }
 }
-
