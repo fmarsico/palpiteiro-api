@@ -22,7 +22,7 @@ public class MatchController {
 
     @Operation(
             summary = "Create a new match",
-            description = "Creates a new match using homeTeamId, awayTeamId and date in ISO-8601 with offset (example: 2026-04-10T20:30:00-03:00)."
+            description = "Creates a new match using homeTeamId, awayTeamId, date in ISO-8601 with offset and phase (GROUP_STAGE, SECOND_ROUND, ROUND_OF_16, QUARTER_FINAL, SEMI_FINAL, FINAL)."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Match successfully created"),
@@ -35,7 +35,7 @@ public class MatchController {
 
     @Operation(
             summary = "Update an existing match",
-            description = "Updates match data and/or result based on the provided ID and team IDs. Date must use ISO-8601 with offset."
+            description = "Updates match data and/or result based on the provided ID and team IDs. Date must use ISO-8601 with offset and phase is required."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Match successfully updated"),

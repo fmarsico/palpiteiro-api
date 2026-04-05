@@ -57,6 +57,7 @@ public class MatchService {
         existing.setHomeTeam(homeTeam);
         existing.setAwayTeam(awayTeam);
         existing.setDate(matchDTO.date());
+        existing.setPhase(matchDTO.phase());
 
         if (matchDTO.result() != null) {
             existing.setResult(matchMapper.toEmbeddable(matchDTO.result()));

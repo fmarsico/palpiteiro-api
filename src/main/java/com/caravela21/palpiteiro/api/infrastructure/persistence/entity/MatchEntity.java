@@ -1,5 +1,6 @@
 package com.caravela21.palpiteiro.api.infrastructure.persistence.entity;
 
+import com.caravela21.palpiteiro.api.enums.MatchPhase;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -25,6 +26,10 @@ public class MatchEntity {
 
     @Column(nullable = false)
     private OffsetDateTime date;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private MatchPhase phase;
 
     @Embedded
     private MatchResultEmbeddable result;

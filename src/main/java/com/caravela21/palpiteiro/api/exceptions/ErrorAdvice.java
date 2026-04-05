@@ -1,5 +1,6 @@
 package com.caravela21.palpiteiro.api.exceptions;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
@@ -7,11 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Global exception handler for handling various exceptions across the application.
@@ -28,6 +32,35 @@ public class ErrorAdvice {
         var errors = ex.getFieldErrors();
         LOGGER.error("MethodArgumentNotValidException: {}", ex.getMessage());
         return ResponseEntity.badRequest().body(errors.stream().map(ValidationErrors::new).toList());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        if (ex.getCause() instanceof InvalidFormatException invalidFormatException
+                && invalidFormatException.getTargetType() != null
+                && invalidFormatException.getTargetType().isEnum()) {
+            String field = invalidFormatException.getPath().isEmpty()
+                    ? "unknown"
+                    : invalidFormatException.getPath().get(invalidFormatException.getPath().size() - 1).getFieldName();
+
+            List<String> acceptedValues = Arrays.stream(invalidFormatException.getTargetType().getEnumConstants())
+                    .map(Object::toString)
+                    .toList();
+
+            String rejectedValue = String.valueOf(invalidFormatException.getValue());
+            String message = "Invalid value '" + rejectedValue + "' for field '" + field + "'.";
+
+            LOGGER.error("HttpMessageNotReadableException (enum): {} Accepted values: {}", message, acceptedValues);
+            return ResponseEntity.badRequest().body(new InvalidEnumErrorDetails(
+                    field,
+                    rejectedValue,
+                    acceptedValues,
+                    message
+            ));
+        }
+
+        LOGGER.error("HttpMessageNotReadableException: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(new ErrorDetails("Malformed request body."));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
