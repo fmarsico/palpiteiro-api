@@ -1,4 +1,11 @@
 spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: static/**,public/**
+    livereload:
+      enabled: true
   application:
     name: palpiteiro-api
 

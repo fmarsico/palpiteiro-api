@@ -1,4 +1,4 @@
-package com.caravela21.palpiteiro.api.dto;
+package com.caravela21.palpiteiro.api.controller.dto;
 
 
 import jakarta.validation.constraints.Email;

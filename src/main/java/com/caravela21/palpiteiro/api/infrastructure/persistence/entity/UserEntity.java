@@ -12,7 +12,7 @@ import java.util.List;
 public class UserEntity {
 
     @Id
-    @Column(columnDefinition = "varchar(36)")
+    @Column(length = 128, nullable = false, updatable = false)
     private String id;
 
     @Column(nullable = false, length = 30)
@@ -33,4 +33,3 @@ public class UserEntity {
     @ManyToMany(mappedBy = "participants")
     private List<PoolEntity> joinedPools;
 }
-

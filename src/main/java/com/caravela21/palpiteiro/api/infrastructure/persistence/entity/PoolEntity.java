@@ -1,16 +1,18 @@
 package com.caravela21.palpiteiro.api.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
 
 @Entity
 @Table(name = "pools")
+@Data
 public class PoolEntity {
 
     @Id
-    @GeneratedValue
-    @Column(columnDefinition = "varchar(36)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36, nullable = false, updatable = false)
     private String id;
 
     private String name;

@@ -1,6 +1,6 @@
 package com.caravela21.palpiteiro.api.controller;
 
-import com.caravela21.palpiteiro.api.dto.UserDTO;
+import com.caravela21.palpiteiro.api.controller.dto.UserDTO;
 import com.caravela21.palpiteiro.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
