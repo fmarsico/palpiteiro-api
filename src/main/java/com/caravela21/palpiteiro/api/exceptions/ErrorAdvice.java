@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -157,6 +158,30 @@ public class ErrorAdvice {
         ErrorDetails errorDetails = new ErrorDetails("An unexpected error occurred.");
         LOGGER.error("Exception: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorDetails);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        String message = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage()
+                : ex.getMessage();
+
+        if (message != null && message.contains("uk_prediction_user_pool_match")) {
+            ErrorDetails errorDetails = new ErrorDetails("Prediction already exists for this user, pool and match. Update the existing prediction instead.");
+            LOGGER.error("DataIntegrityViolationException (prediction unique): {}", message);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorDetails);
+        }
+
+        ErrorDetails errorDetails = new ErrorDetails("Data integrity violation.");
+        LOGGER.error("DataIntegrityViolationException: {}", message, ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+    }
+
+    @ExceptionHandler(PredictionDeadlineExceededException.class)
+    public ResponseEntity<?> handlePredictionDeadlineExceededException(PredictionDeadlineExceededException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(ex.getMessage());
+        LOGGER.error("PredictionDeadlineExceededException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
     }
 
 

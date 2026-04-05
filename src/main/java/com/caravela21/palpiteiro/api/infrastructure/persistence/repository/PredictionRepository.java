@@ -10,6 +10,8 @@ public interface PredictionRepository extends JpaRepository<PredictionEntity, St
 
     List<PredictionEntity> findByUserIdAndPoolId(String userId, String poolId);
 
+    List<PredictionEntity> findByPoolId(String poolId);
+
     Optional<PredictionEntity> findByUserIdAndPoolIdAndMatchId(
             String userId,
             String poolId,
