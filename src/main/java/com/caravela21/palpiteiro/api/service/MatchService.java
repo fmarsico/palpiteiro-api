@@ -1,6 +1,8 @@
 package com.caravela21.palpiteiro.api.service;
 
 import com.caravela21.palpiteiro.api.controller.dto.MatchDTO;
+import com.caravela21.palpiteiro.api.controller.dto.MatchResultBatchDTO;
+import com.caravela21.palpiteiro.api.controller.dto.MatchResultUpdateItemDTO;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.TeamEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.mapper.MatchMapper;
@@ -11,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +80,34 @@ public class MatchService {
                 .stream()
                 .map(matchMapper::toDTO)
                 .toList();
+    }
+
+    @Transactional
+    public List<MatchDTO> updateMatchResults(MatchResultBatchDTO batchDTO) {
+        validateDuplicateMatchIds(batchDTO.results());
+
+        return batchDTO.results().stream()
+                .map(this::updateSingleMatchResult)
+                .toList();
+    }
+
+    private MatchDTO updateSingleMatchResult(MatchResultUpdateItemDTO item) {
+        MatchEntity existing = matchRepository.findById(item.matchId())
+                .orElseThrow(() -> new EntityNotFoundException("Match not found with id: " + item.matchId()));
+
+        existing.setResult(matchMapper.toEmbeddable(item.result()));
+
+        MatchEntity saved = matchRepository.save(existing);
+        return matchMapper.toDTO(saved);
+    }
+
+    private void validateDuplicateMatchIds(List<MatchResultUpdateItemDTO> items) {
+        Set<String> seenIds = new HashSet<>();
+        for (MatchResultUpdateItemDTO item : items) {
+            if (!seenIds.add(item.matchId())) {
+                throw new IllegalArgumentException("Duplicate match ID in request: " + item.matchId());
+            }
+        }
     }
 
     private TeamEntity findTeamById(String id) {

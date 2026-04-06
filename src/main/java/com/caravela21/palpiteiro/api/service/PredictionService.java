@@ -1,6 +1,7 @@
 package com.caravela21.palpiteiro.api.service;
 
-import com.caravela21.palpiteiro.api.controller.dto.PredictionDTO;
+import com.caravela21.palpiteiro.api.controller.dto.PredictionBatchDTO;
+import com.caravela21.palpiteiro.api.controller.dto.PredictionItemDTO;
 import com.caravela21.palpiteiro.api.enums.PoolMembershipStatus;
 import com.caravela21.palpiteiro.api.exceptions.PredictionDeadlineExceededException;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,39 +32,48 @@ public class PredictionService {
     private final MatchRepository matchRepository;
     private final PoolMembershipRepository poolMembershipRepository;
 
+    /**
+     * Salva ou atualiza uma lista de palpites de uma vez, dentro de uma única transação.
+     * Se qualquer palpite for inválido (deadline, membership, etc.), toda a operação falha.
+     */
     @Transactional
-    public PredictionDTO upsertPrediction(PredictionDTO predictionDTO) {
-        UserEntity user = userRepository.findById(predictionDTO.userId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + predictionDTO.userId()));
+    public List<PredictionItemDTO> upsertPredictions(PredictionBatchDTO batchDTO) {
+        UserEntity user = userRepository.findById(batchDTO.userId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + batchDTO.userId()));
 
-        PoolEntity pool = poolRepository.findById(predictionDTO.poolId())
-                .orElseThrow(() -> new EntityNotFoundException("Pool not found with id: " + predictionDTO.poolId()));
-
-        MatchEntity match = matchRepository.findById(predictionDTO.matchId())
-                .orElseThrow(() -> new EntityNotFoundException("Match not found with id: " + predictionDTO.matchId()));
+        PoolEntity pool = poolRepository.findById(batchDTO.poolId())
+                .orElseThrow(() -> new EntityNotFoundException("Pool not found with id: " + batchDTO.poolId()));
 
         validatePoolMembership(user, pool);
+
+        return batchDTO.predictions().stream()
+                .map(item -> upsertSingle(user, pool, item))
+                .toList();
+    }
+
+    private PredictionItemDTO upsertSingle(UserEntity user, PoolEntity pool, PredictionItemDTO item) {
+        MatchEntity match = matchRepository.findById(item.matchId())
+                .orElseThrow(() -> new EntityNotFoundException("Match not found with id: " + item.matchId()));
+
         validatePhaseDeadline(match);
 
         PredictionEntity prediction = predictionRepository
-                .findByUserIdAndPoolIdAndMatchId(predictionDTO.userId(), predictionDTO.poolId(), predictionDTO.matchId())
+                .findByUserIdAndPoolIdAndMatchId(user.getId(), pool.getId(), match.getId())
                 .orElseGet(PredictionEntity::new);
 
         prediction.setUser(user);
         prediction.setPool(pool);
         prediction.setMatch(match);
-        prediction.setHomeScore(predictionDTO.homeScore());
-        prediction.setAwayScore(predictionDTO.awayScore());
+        prediction.setHomeScore(item.homeScore());
+        prediction.setAwayScore(item.awayScore());
 
         PredictionEntity saved = predictionRepository.save(prediction);
-        return toDTO(saved);
+        return toItemDTO(saved);
     }
 
     private void validatePoolMembership(UserEntity user, PoolEntity pool) {
-        // Verifica se é o owner da pool
         boolean isOwner = pool.getOwner() != null && pool.getOwner().getId().equals(user.getId());
 
-        // Verifica se é membro aprovado da pool
         boolean isApprovedMember = poolMembershipRepository.findByPoolIdAndUserId(pool.getId(), user.getId())
                 .map(membership -> membership.getStatus().equals(PoolMembershipStatus.APPROVED))
                 .orElse(false);
@@ -85,14 +96,14 @@ public class PredictionService {
         }
     }
 
-    private PredictionDTO toDTO(PredictionEntity entity) {
-        return new PredictionDTO(
+    private PredictionItemDTO toItemDTO(PredictionEntity entity) {
+        return new PredictionItemDTO(
                 entity.getId(),
-                entity.getUser().getId(),
-                entity.getPool().getId(),
                 entity.getMatch().getId(),
                 entity.getHomeScore(),
                 entity.getAwayScore()
         );
     }
 }
+
+

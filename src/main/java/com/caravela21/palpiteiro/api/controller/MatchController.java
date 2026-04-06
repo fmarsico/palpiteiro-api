@@ -1,6 +1,7 @@
 package com.caravela21.palpiteiro.api.controller;
 
 import com.caravela21.palpiteiro.api.controller.dto.MatchDTO;
+import com.caravela21.palpiteiro.api.controller.dto.MatchResultBatchDTO;
 import com.caravela21.palpiteiro.api.service.MatchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -45,6 +46,20 @@ public class MatchController {
     @PutMapping("/{id}")
     public ResponseEntity<MatchDTO> updateMatch(@PathVariable String id, @RequestBody @Valid MatchDTO matchDTO) {
         return ResponseEntity.ok(matchService.updateMatch(id, matchDTO));
+    }
+
+    @Operation(
+            summary = "Update one or more match results",
+            description = "Updates the result of one or many matches in a single request. Existing match metadata remains unchanged."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Match results updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request data or duplicate match IDs"),
+            @ApiResponse(responseCode = "404", description = "One or more matches not found")
+    })
+    @PutMapping("/results")
+    public ResponseEntity<List<MatchDTO>> updateMatchResults(@RequestBody @Valid MatchResultBatchDTO batchDTO) {
+        return ResponseEntity.ok(matchService.updateMatchResults(batchDTO));
     }
 
     @Operation(

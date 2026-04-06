@@ -1,6 +1,7 @@
 package com.caravela21.palpiteiro.api.controller;
 
-import com.caravela21.palpiteiro.api.controller.dto.PredictionDTO;
+import com.caravela21.palpiteiro.api.controller.dto.PredictionBatchDTO;
+import com.caravela21.palpiteiro.api.controller.dto.PredictionItemDTO;
 import com.caravela21.palpiteiro.api.service.PredictionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/prediction")
 @RequiredArgsConstructor
@@ -20,19 +23,19 @@ public class PredictionController {
 
     private final PredictionService predictionService;
 
-
     @Operation(
-            summary = "Create or update a prediction",
-            description = "Creates a new prediction or updates the existing one for the same user, pool and match."
+            summary = "Create or update predictions",
+            description = "Creates or updates one or more predictions for the same user and pool in a single request."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Prediction saved successfully"),
+            @ApiResponse(responseCode = "200", description = "Predictions saved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data or prediction deadline expired"),
             @ApiResponse(responseCode = "404", description = "User, pool, or match not found")
     })
     @PostMapping
-    public ResponseEntity<PredictionDTO> upsertPrediction(@RequestBody @Valid PredictionDTO predictionDTO) {
-        return ResponseEntity.ok(predictionService.upsertPrediction(predictionDTO));
+    public ResponseEntity<List<PredictionItemDTO>> upsertPredictions(@RequestBody @Valid PredictionBatchDTO batchDTO) {
+        return ResponseEntity.ok(predictionService.upsertPredictions(batchDTO));
     }
 }
+
 
