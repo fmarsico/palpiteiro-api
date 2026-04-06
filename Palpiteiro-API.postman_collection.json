@@ -1,0 +1,270 @@
+{
+	"info": {
+		"_postman_id": "da8222a9-8238-4a62-8d72-68344de549b0",
+		"name": "Palpiteiro-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30373660",
+		"_collection_link": "https://bytemachine.postman.co/workspace/Bytemachine-Workspace~f55eacb4-616e-4d33-8955-eb190dddf47a/collection/30373660-da8222a9-8238-4a62-8d72-68344de549b0?action=share&source=collection_link&creator=30373660"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"f8H3kL9sQ2Yp7Zx1A0bC\",\n  \"name\": \"Francesco\",\n  \"lastname\": \"Silva\",\n  \"email\": \"francesco@example.com\",\n  \"photoUrl\": \"https://example.com/photo.jpg\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"f8H3kL9sQ2Yp7Zx1A0bC\",\n  \"name\": \"Francesco\",\n  \"lastname\": \"Marsico\",\n  \"email\": \"francesco@example.com\",\n  \"photoUrl\": \"https://example.com/photo.jpg\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Pool",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Bolão Mcdetmott\",\n  \"ownerId\": \"f8H3kL9sQ2Yp7Zx1A0bC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/pool",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pool"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find pool by invite code",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/pool/invite/7SMG9CRR",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pool",
+						"invite",
+						"7SMG9CRR"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request access",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"poolId\": \"ab25797d-a57d-4d87-9d4c-0b508f1e9cc6\",\n  \"userId\": \"f8H3kL9sQ2Yp7Zx1A0bC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/pool/ab25797d-a57d-4d87-9d4c-0b508f1e9cc6/request-access",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pool",
+						"ab25797d-a57d-4d87-9d4c-0b508f1e9cc6",
+						"request-access"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Membership",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userId\": \"f8H3kL9sQ2Yp7Zx1A0bC\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/pool/ab25797d-a57d-4d87-9d4c-0b508f1e9cc6/approve-member?poolId=ab25797d-a57d-4d87-9d4c-0b508f1e9cc6&ownerId=f8H3kL9sQ2Yp7Zx1A0bC",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pool",
+						"ab25797d-a57d-4d87-9d4c-0b508f1e9cc6",
+						"approve-member"
+					],
+					"query": [
+						{
+							"key": "poolId",
+							"value": "ab25797d-a57d-4d87-9d4c-0b508f1e9cc6"
+						},
+						{
+							"key": "ownerId",
+							"value": "f8H3kL9sQ2Yp7Zx1A0bC"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create predictions",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userId\": \"f8H3kL9sQ2Yp7Zx1A0bC\",\n  \"poolId\": \"ab25797d-a57d-4d87-9d4c-0b508f1e9cc6\",\n  \"predictions\": [\n    { \"matchId\": \"2ff2a5ca-384d-4427-bbdb-30dd9a303c9e\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"b16a38c9-b6b2-4a86-a82b-5fd8846797c7\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"7a8e9774-f944-4cbb-a011-e5e0e6118814\", \"homeScore\": 0, \"awayScore\": 2 },\n    { \"matchId\": \"2a257a8b-ff7b-47e7-9a15-ddd88c8aa19c\", \"homeScore\": 2, \"awayScore\": 1 },\n\n    { \"matchId\": \"e0226c20-13df-4f88-a8d0-5c6309ccac70\", \"homeScore\": 1, \"awayScore\": 2 },\n    { \"matchId\": \"1dacb9ec-2345-4420-846c-6ae7b030bcaf\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"7bfc4ebe-ee78-4b84-98c4-d2992121e042\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"44e512ed-73bc-410d-9071-9fa2338f2985\", \"homeScore\": 2, \"awayScore\": 1 },\n\n    { \"matchId\": \"4481baa3-053d-4c43-bbf9-8410b3c87f76\", \"homeScore\": 1, \"awayScore\": 2 },\n    { \"matchId\": \"280cca82-a408-4069-b9b3-aec54e84378f\", \"homeScore\": 3, \"awayScore\": 1 },\n    { \"matchId\": \"fbaf47cf-17f9-4c14-83d2-fc7349899b7e\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"1691c600-5b0f-412d-b4e8-a9229dd54818\", \"homeScore\": 2, \"awayScore\": 0 },\n\n    { \"matchId\": \"47d3f999-06ff-453f-886c-67a19861114b\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"8edd2eed-65c7-42c3-9622-2d638f4ded38\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"509e55ff-7390-4832-8320-fca0ff9eff78\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"56d7343b-b6ba-4166-8d27-8108ba11625f\", \"homeScore\": 3, \"awayScore\": 1 },\n\n    { \"matchId\": \"899a1f40-5e72-4fe8-b5ee-dd4484482248\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"ae2600dd-3d1f-4c91-924d-eeb97e325e87\", \"homeScore\": 2, \"awayScore\": 1 },\n    { \"matchId\": \"4ad40587-1542-4c76-8e35-8b48f4777067\", \"homeScore\": 0, \"awayScore\": 2 },\n    { \"matchId\": \"f08a3c09-13d5-4c71-aa40-7e8cb1c18fb7\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"22b09c1c-9116-4fe2-9fb2-2a2a8c8f25a9\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"d5dd96a5-42e6-4408-94ac-49d0fd621a1b\", \"homeScore\": 1, \"awayScore\": 1 },\n\n    { \"matchId\": \"782c25f7-06d8-43e7-bb91-eb0056f9b70c\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"831e21fd-35d3-4937-8700-c12d70229793\", \"homeScore\": 0, \"awayScore\": 0 },\n    { \"matchId\": \"72b82e57-f2ee-4f81-b3bf-1735600eae72\", \"homeScore\": 2, \"awayScore\": 1 },\n    { \"matchId\": \"b443b22b-cc25-49fe-9564-94148d77e1e2\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"2b292de0-7973-4149-8897-a96f41773652\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"b97980a6-eee4-431e-8227-7aefbf354835\", \"homeScore\": 0, \"awayScore\": 1 },\n    { \"matchId\": \"3788c66b-f168-4425-bf67-f7e03a56f47f\", \"homeScore\": 2, \"awayScore\": 1 },\n    { \"matchId\": \"85f6045e-749d-4d1b-842e-eba17b2b7bd9\", \"homeScore\": 3, \"awayScore\": 0 },\n\n    { \"matchId\": \"0ca14982-135c-4216-a74e-b82cd52be228\", \"homeScore\": 0, \"awayScore\": 1 },\n    { \"matchId\": \"da1aa30e-cda0-459c-bb70-890ef31de187\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"af35350c-ae35-4ef5-b871-9f6bd51e0f95\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"7782d1f1-e61a-4875-b43f-ef4762e23300\", \"homeScore\": 2, \"awayScore\": 1 },\n\n    { \"matchId\": \"6f268b5c-c09a-4476-97e4-086093e1ba5d\", \"homeScore\": 0, \"awayScore\": 1 },\n    { \"matchId\": \"58173099-42bf-4290-9797-5461ffaf3e9a\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"fcd641c4-af40-4fb8-8334-1b5d15ecdbed\", \"homeScore\": 1, \"awayScore\": 2 },\n    { \"matchId\": \"f203f290-0a12-4d3b-a125-07915b321bae\", \"homeScore\": 3, \"awayScore\": 1 },\n\n    { \"matchId\": \"694b2c4d-dc8e-4bd4-9f35-09410a22938f\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"4a220c93-7877-499c-9abb-d194e165ecef\", \"homeScore\": 2, \"awayScore\": 0 },\n\n    { \"matchId\": \"abf9f758-073a-48c4-81ec-b8a5a09d7a5f\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"621985f4-8081-41ab-8729-551cd90aa37e\", \"homeScore\": 2, \"awayScore\": 1 },\n    { \"matchId\": \"c0ac183e-f1c4-4800-834f-15a55253318b\", \"homeScore\": 1, \"awayScore\": 2 },\n    { \"matchId\": \"6c53f8d7-ab83-4b2b-9a79-214a5e55bda0\", \"homeScore\": 1, \"awayScore\": 1 },\n\n    { \"matchId\": \"d52af532-586e-42d5-b79c-d2a32e98c391\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"e95d399b-2dd6-42b4-8eb7-bbd7198b96e1\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"7a106754-fb75-4225-adcf-6917dd960999\", \"homeScore\": 0, \"awayScore\": 0 },\n    { \"matchId\": \"9144154f-e21d-4800-99de-0c96020589f4\", \"homeScore\": 2, \"awayScore\": 1 },\n\n    { \"matchId\": \"3a4b08c5-8bf4-445f-98fe-68174aee4dcc\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"e0d0d57a-bae2-40f8-97ce-7e195b855c50\", \"homeScore\": 1, \"awayScore\": 2 },\n    { \"matchId\": \"18f8a561-eddb-45fb-9cad-6667747a8ec6\", \"homeScore\": 2, \"awayScore\": 2 },\n    { \"matchId\": \"5b2dd5e7-454d-4adc-bc6c-395128343aa3\", \"homeScore\": 0, \"awayScore\": 1 },\n\n    { \"matchId\": \"540da328-38fd-4c4e-a2c3-e47b27153bfc\", \"homeScore\": 1, \"awayScore\": 1 },\n    { \"matchId\": \"608f81b7-f9c4-4bca-ba2b-f49d5b044d17\", \"homeScore\": 2, \"awayScore\": 1 },\n    { \"matchId\": \"7a892646-a124-4f64-ad44-5a8315b99855\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"b49af0bf-b11c-4d4b-bfa6-85bc0d135458\", \"homeScore\": 1, \"awayScore\": 2 },\n\n    { \"matchId\": \"ed506e9a-8830-433a-bf9a-f475e1bfa41b\", \"homeScore\": 0, \"awayScore\": 1 },\n    { \"matchId\": \"f1541fd9-c01f-40ed-be91-6a0657b35c21\", \"homeScore\": 2, \"awayScore\": 2 },\n    { \"matchId\": \"2ba3eb0a-9594-493e-9752-9afa437a887b\", \"homeScore\": 0, \"awayScore\": 1 },\n    { \"matchId\": \"36af309f-56a1-462c-b8d2-b57f0158e230\", \"homeScore\": 2, \"awayScore\": 0 },\n\n    { \"matchId\": \"8cbe82b7-f544-401f-9839-07ef72b97814\", \"homeScore\": 2, \"awayScore\": 1 },\n    { \"matchId\": \"ae0b5e8b-41d3-436d-9983-4d9ed937131f\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"2103e83a-6f12-485d-b4f9-bf3e45199d3c\", \"homeScore\": 3, \"awayScore\": 1 },\n    { \"matchId\": \"247ac185-a3fe-41fb-a985-3f336ad779b9\", \"homeScore\": 1, \"awayScore\": 1 },\n\n    { \"matchId\": \"3722f22a-6e4b-4001-8f3c-08658b8b5abc\", \"homeScore\": 1, \"awayScore\": 2 },\n    { \"matchId\": \"3fa6254f-42b9-45ed-ad3e-b0459f4c7340\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"635f717b-b627-4826-aacd-626e9c7f6920\", \"homeScore\": 1, \"awayScore\": 0 },\n    { \"matchId\": \"a46390e9-5eb2-4445-a7ac-41453a734e11\", \"homeScore\": 1, \"awayScore\": 1 },\n\n    { \"matchId\": \"380b2af4-41a6-4c64-99bd-eb892efd2b8c\", \"homeScore\": 0, \"awayScore\": 1 },\n    { \"matchId\": \"e206894f-4ec6-44e4-8dd0-f79eac2632fb\", \"homeScore\": 2, \"awayScore\": 0 },\n    { \"matchId\": \"7a2b06b9-302e-4ed7-9fe4-7590548408d5\", \"homeScore\": 0, \"awayScore\": 2 },\n    { \"matchId\": \"ef83c111-8d64-4f25-afb2-7b9a02504bc3\", \"homeScore\": 2, \"awayScore\": 1 }\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/prediction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"prediction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update matches results",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"results\": [\n    { \"matchId\": \"2ff2a5ca-384d-4427-bbdb-30dd9a303c9e\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"b16a38c9-b6b2-4a86-a82b-5fd8846797c7\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"7a8e9774-f944-4cbb-a011-e5e0e6118814\", \"result\": { \"homeScore\": 0, \"awayScore\": 2 } },\n    { \"matchId\": \"2a257a8b-ff7b-47e7-9a15-ddd88c8aa19c\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n\n    { \"matchId\": \"e0226c20-13df-4f88-a8d0-5c6309ccac70\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n    { \"matchId\": \"1dacb9ec-2345-4420-846c-6ae7b030bcaf\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"7bfc4ebe-ee78-4b84-98c4-d2992121e042\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"44e512ed-73bc-410d-9071-9fa2338f2985\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n\n    { \"matchId\": \"4481baa3-053d-4c43-bbf9-8410b3c87f76\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n    { \"matchId\": \"280cca82-a408-4069-b9b3-aec54e84378f\", \"result\": { \"homeScore\": 3, \"awayScore\": 1 } },\n    { \"matchId\": \"fbaf47cf-17f9-4c14-83d2-fc7349899b7e\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"1691c600-5b0f-412d-b4e8-a9229dd54818\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n\n    { \"matchId\": \"47d3f999-06ff-453f-886c-67a19861114b\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"8edd2eed-65c7-42c3-9622-2d638f4ded38\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"509e55ff-7390-4832-8320-fca0ff9eff78\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"56d7343b-b6ba-4166-8d27-8108ba11625f\", \"result\": { \"homeScore\": 3, \"awayScore\": 1 } },\n\n    { \"matchId\": \"899a1f40-5e72-4fe8-b5ee-dd4484482248\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"ae2600dd-3d1f-4c91-924d-eeb97e325e87\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n    { \"matchId\": \"4ad40587-1542-4c76-8e35-8b48f4777067\", \"result\": { \"homeScore\": 0, \"awayScore\": 2 } },\n    { \"matchId\": \"f08a3c09-13d5-4c71-aa40-7e8cb1c18fb7\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"22b09c1c-9116-4fe2-9fb2-2a2a8c8f25a9\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"d5dd96a5-42e6-4408-94ac-49d0fd621a1b\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n\n    { \"matchId\": \"782c25f7-06d8-43e7-bb91-eb0056f9b70c\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"831e21fd-35d3-4937-8700-c12d70229793\", \"result\": { \"homeScore\": 0, \"awayScore\": 0 } },\n    { \"matchId\": \"72b82e57-f2ee-4f81-b3bf-1735600eae72\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n    { \"matchId\": \"b443b22b-cc25-49fe-9564-94148d77e1e2\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"2b292de0-7973-4149-8897-a96f41773652\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"b97980a6-eee4-431e-8227-7aefbf354835\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n    { \"matchId\": \"3788c66b-f168-4425-bf67-f7e03a56f47f\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n    { \"matchId\": \"85f6045e-749d-4d1b-842e-eba17b2b7bd9\", \"result\": { \"homeScore\": 3, \"awayScore\": 0 } },\n\n    { \"matchId\": \"0ca14982-135c-4216-a74e-b82cd52be228\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n    { \"matchId\": \"da1aa30e-cda0-459c-bb70-890ef31de187\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"af35350c-ae35-4ef5-b871-9f6bd51e0f95\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"7782d1f1-e61a-4875-b43f-ef4762e23300\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n\n    { \"matchId\": \"6f268b5c-c09a-4476-97e4-086093e1ba5d\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n    { \"matchId\": \"58173099-42bf-4290-9797-5461ffaf3e9a\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"fcd641c4-af40-4fb8-8334-1b5d15ecdbed\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n    { \"matchId\": \"f203f290-0a12-4d3b-a125-07915b321bae\", \"result\": { \"homeScore\": 3, \"awayScore\": 1 } },\n\n    { \"matchId\": \"694b2c4d-dc8e-4bd4-9f35-09410a22938f\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"4a220c93-7877-499c-9abb-d194e165ecef\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n\n    { \"matchId\": \"abf9f758-073a-48c4-81ec-b8a5a09d7a5f\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"621985f4-8081-41ab-8729-551cd90aa37e\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n    { \"matchId\": \"c0ac183e-f1c4-4800-834f-15a55253318b\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n    { \"matchId\": \"6c53f8d7-ab83-4b2b-9a79-214a5e55bda0\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n\n    { \"matchId\": \"d52af532-586e-42d5-b79c-d2a32e98c391\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"e95d399b-2dd6-42b4-8eb7-bbd7198b96e1\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"7a106754-fb75-4225-adcf-6917dd960999\", \"result\": { \"homeScore\": 0, \"awayScore\": 0 } },\n    { \"matchId\": \"9144154f-e21d-4800-99de-0c96020589f4\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n\n    { \"matchId\": \"3a4b08c5-8bf4-445f-98fe-68174aee4dcc\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"e0d0d57a-bae2-40f8-97ce-7e195b855c50\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n    { \"matchId\": \"18f8a561-eddb-45fb-9cad-6667747a8ec6\", \"result\": { \"homeScore\": 2, \"awayScore\": 2 } },\n    { \"matchId\": \"5b2dd5e7-454d-4adc-bc6c-395128343aa3\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n\n    { \"matchId\": \"540da328-38fd-4c4e-a2c3-e47b27153bfc\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n    { \"matchId\": \"608f81b7-f9c4-4bca-ba2b-f49d5b044d17\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n    { \"matchId\": \"7a892646-a124-4f64-ad44-5a8315b99855\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"b49af0bf-b11c-4d4b-bfa6-85bc0d135458\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n\n    { \"matchId\": \"ed506e9a-8830-433a-bf9a-f475e1bfa41b\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n    { \"matchId\": \"f1541fd9-c01f-40ed-be91-6a0657b35c21\", \"result\": { \"homeScore\": 2, \"awayScore\": 2 } },\n    { \"matchId\": \"2ba3eb0a-9594-493e-9752-9afa437a887b\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n    { \"matchId\": \"36af309f-56a1-462c-b8d2-b57f0158e230\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n\n    { \"matchId\": \"8cbe82b7-f544-401f-9839-07ef72b97814\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } },\n    { \"matchId\": \"ae0b5e8b-41d3-436d-9983-4d9ed937131f\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"2103e83a-6f12-485d-b4f9-bf3e45199d3c\", \"result\": { \"homeScore\": 3, \"awayScore\": 1 } },\n    { \"matchId\": \"247ac185-a3fe-41fb-a985-3f336ad779b9\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n\n    { \"matchId\": \"3722f22a-6e4b-4001-8f3c-08658b8b5abc\", \"result\": { \"homeScore\": 1, \"awayScore\": 2 } },\n    { \"matchId\": \"3fa6254f-42b9-45ed-ad3e-b0459f4c7340\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"635f717b-b627-4826-aacd-626e9c7f6920\", \"result\": { \"homeScore\": 1, \"awayScore\": 0 } },\n    { \"matchId\": \"a46390e9-5eb2-4445-a7ac-41453a734e11\", \"result\": { \"homeScore\": 1, \"awayScore\": 1 } },\n\n    { \"matchId\": \"380b2af4-41a6-4c64-99bd-eb892efd2b8c\", \"result\": { \"homeScore\": 0, \"awayScore\": 1 } },\n    { \"matchId\": \"e206894f-4ec6-44e4-8dd0-f79eac2632fb\", \"result\": { \"homeScore\": 2, \"awayScore\": 0 } },\n    { \"matchId\": \"7a2b06b9-302e-4ed7-9fe4-7590548408d5\", \"result\": { \"homeScore\": 0, \"awayScore\": 2 } },\n    { \"matchId\": \"ef83c111-8d64-4f25-afb2-7b9a02504bc3\", \"result\": { \"homeScore\": 2, \"awayScore\": 1 } }\n  ]\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/match/results",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"match",
+						"results"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ranking",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/pool/ab25797d-a57d-4d87-9d4c-0b508f1e9cc6/ranking?poolId=ab25797d-a57d-4d87-9d4c-0b508f1e9cc6",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"pool",
+						"ab25797d-a57d-4d87-9d4c-0b508f1e9cc6",
+						"ranking"
+					],
+					"query": [
+						{
+							"key": "poolId",
+							"value": "ab25797d-a57d-4d87-9d4c-0b508f1e9cc6"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
