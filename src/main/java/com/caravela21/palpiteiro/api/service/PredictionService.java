@@ -33,25 +33,60 @@ public class PredictionService {
     private final PoolMembershipRepository poolMembershipRepository;
 
     /**
-     * Salva ou atualiza uma lista de palpites de uma vez, dentro de uma única transação.
-     * Se qualquer palpite for inválido (deadline, membership, etc.), toda a operação falha.
+     * Cria uma lista de palpites em uma única transação.
+     * Se algum palpite já existir para (user, pool, match), a operação falha.
      */
     @Transactional
-    public List<PredictionItemDTO> upsertPredictions(PredictionBatchDTO batchDTO) {
-        UserEntity user = userRepository.findById(batchDTO.userId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + batchDTO.userId()));
-
-        PoolEntity pool = poolRepository.findById(batchDTO.poolId())
-                .orElseThrow(() -> new EntityNotFoundException("Pool not found with id: " + batchDTO.poolId()));
+    public List<PredictionItemDTO> createPredictions(PredictionBatchDTO batchDTO) {
+        UserEntity user = findUser(batchDTO.userId());
+        PoolEntity pool = findPool(batchDTO.poolId());
 
         validatePoolMembership(user, pool);
 
         return batchDTO.predictions().stream()
-                .map(item -> upsertSingle(user, pool, item))
+                .map(item -> createSingle(user, pool, item))
                 .toList();
     }
 
-    private PredictionItemDTO upsertSingle(UserEntity user, PoolEntity pool, PredictionItemDTO item) {
+    /**
+     * Atualiza uma lista de palpites em uma única transação.
+     * Se algum palpite não existir para (user, pool, match), a operação falha.
+     */
+    @Transactional
+    public List<PredictionItemDTO> updatePredictions(PredictionBatchDTO batchDTO) {
+        UserEntity user = findUser(batchDTO.userId());
+        PoolEntity pool = findPool(batchDTO.poolId());
+
+        validatePoolMembership(user, pool);
+
+        return batchDTO.predictions().stream()
+                .map(item -> updateSingle(user, pool, item))
+                .toList();
+    }
+
+    private PredictionItemDTO createSingle(UserEntity user, PoolEntity pool, PredictionItemDTO item) {
+        MatchEntity match = matchRepository.findById(item.matchId())
+                .orElseThrow(() -> new EntityNotFoundException("Match not found with id: " + item.matchId()));
+
+        validatePhaseDeadline(match);
+
+        var existing = predictionRepository.findByUserIdAndPoolIdAndMatchId(user.getId(), pool.getId(), match.getId());
+        if (existing.isPresent()) {
+            throw new IllegalArgumentException("Prediction already exists for this user, pool and match");
+        }
+
+        PredictionEntity prediction = new PredictionEntity();
+        prediction.setUser(user);
+        prediction.setPool(pool);
+        prediction.setMatch(match);
+        prediction.setHomeScore(item.homeScore());
+        prediction.setAwayScore(item.awayScore());
+
+        PredictionEntity saved = predictionRepository.save(prediction);
+        return toItemDTO(saved);
+    }
+
+    private PredictionItemDTO updateSingle(UserEntity user, PoolEntity pool, PredictionItemDTO item) {
         MatchEntity match = matchRepository.findById(item.matchId())
                 .orElseThrow(() -> new EntityNotFoundException("Match not found with id: " + item.matchId()));
 
@@ -59,7 +94,7 @@ public class PredictionService {
 
         PredictionEntity prediction = predictionRepository
                 .findByUserIdAndPoolIdAndMatchId(user.getId(), pool.getId(), match.getId())
-                .orElseGet(PredictionEntity::new);
+                .orElseThrow(() -> new IllegalArgumentException("Prediction not found for this user, pool and match"));
 
         prediction.setUser(user);
         prediction.setPool(pool);
@@ -69,6 +104,16 @@ public class PredictionService {
 
         PredictionEntity saved = predictionRepository.save(prediction);
         return toItemDTO(saved);
+    }
+
+    private UserEntity findUser(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+    }
+
+    private PoolEntity findPool(String poolId) {
+        return poolRepository.findById(poolId)
+                .orElseThrow(() -> new EntityNotFoundException("Pool not found with id: " + poolId));
     }
 
     private void validatePoolMembership(UserEntity user, PoolEntity pool) {

@@ -80,6 +80,10 @@ public class PoolService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        if (pool.getOwner() != null && pool.getOwner().getId().equals(userId)) {
+            throw new IllegalArgumentException("Pool owner cannot request access to their own pool");
+        }
+
         // Verifica se o usuário já tem requisição pendente ou aprovada
         var existingMembership = poolMembershipRepository.findByPoolIdAndUserId(poolId, userId);
         if (existingMembership.isPresent()) {
