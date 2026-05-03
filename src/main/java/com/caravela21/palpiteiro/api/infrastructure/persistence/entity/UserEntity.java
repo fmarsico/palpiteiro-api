@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.util.List;
 
-
 @Entity
 @Table(name = "users")
 @Data
@@ -26,6 +25,10 @@ public class UserEntity {
 
     @Column(length = 500)
     private String photoUrl;
+
+    /** Senha usada apenas para autenticação de desenvolvimento. Será removida ao integrar Firebase. */
+    @Column(length = 255)
+    private String password;
 
     @OneToMany(mappedBy = "owner")
     private List<PoolEntity> createdPools;
