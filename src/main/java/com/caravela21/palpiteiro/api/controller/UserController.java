@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,16 +34,21 @@ public class UserController {
     }
 
     @Operation(
-            summary = "Update an existing user",
-            description = "Updates user information based on the provided Firebase UID."
+            summary = "Update authenticated user",
+            description = "Updates the currently authenticated user identified by the JWT subject."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User successfully updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data or missing user ID"),
-            @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "400", description = "Invalid request data"),
+            @ApiResponse(responseCode = "401", description = "Unauthenticated request"),
+            @ApiResponse(responseCode = "404", description = "Authenticated user not found")
     })
-    @PutMapping
-    public ResponseEntity<UserDTO> updateUser(@RequestBody @Valid UserDTO userDTO) {
-        return ResponseEntity.ok().body(userService.updateUser(userDTO));
+    @PutMapping({"", "/me"})
+    public ResponseEntity<UserDTO> updateMe(Authentication authentication, @RequestBody @Valid UserDTO userDTO) {
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok().body(userService.updateAuthenticatedUser(authentication.getName(), userDTO));
     }
 }
