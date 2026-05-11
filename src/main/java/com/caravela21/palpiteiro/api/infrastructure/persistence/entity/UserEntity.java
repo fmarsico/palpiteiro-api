@@ -33,9 +33,6 @@ public class UserEntity  implements UserDetails {
     @Column(length = 500)
     private String photoUrl;
 
-    /**
-     * Password used by the temporary local authentication flow (dev only).
-     */
     @Column(length = 255)
     private String password;
 

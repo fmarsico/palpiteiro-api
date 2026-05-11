@@ -23,4 +23,3 @@ public record RegisterRequestDTO(
 		String photoUrl
 ) {
 }
-

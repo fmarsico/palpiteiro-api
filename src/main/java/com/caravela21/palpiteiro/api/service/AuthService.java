@@ -54,4 +54,3 @@ public class AuthService {
 		return new LoginResponseDTO(token, user.getId(), user.getName(), user.getEmail());
 	}
 }
-

@@ -10,6 +10,9 @@ import java.util.Optional;
 public interface PoolMembershipRepository extends JpaRepository<PoolMembershipEntity, String> {
     Optional<PoolMembershipEntity> findByPoolIdAndUserId(String poolId, String userId);
     List<PoolMembershipEntity> findByPoolId(String poolId);
+    List<PoolMembershipEntity> findByPoolIdAndStatus(String poolId, PoolMembershipStatus status);
     List<PoolMembershipEntity> findByPoolIdOrderByStatusAscRequestedAtAsc(String poolId);
+    List<PoolMembershipEntity> findByUserId(String userId);
+    List<PoolMembershipEntity> findByUserIdAndStatus(String userId, PoolMembershipStatus status);
 }
 

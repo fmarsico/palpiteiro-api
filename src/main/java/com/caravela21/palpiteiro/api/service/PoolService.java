@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,10 +86,22 @@ public class PoolService {
             throw new IllegalArgumentException("Pool owner cannot request access to their own pool");
         }
 
-        // Verifica se o usuário já tem requisição pendente ou aprovada
+        // Verifica se já existe um membership para este usuário nesta pool
         var existingMembership = poolMembershipRepository.findByPoolIdAndUserId(poolId, userId);
         if (existingMembership.isPresent()) {
-            throw new IllegalArgumentException("User already has a membership request or is already a member of this pool");
+            PoolMembershipEntity existing = existingMembership.get();
+            switch (existing.getStatus()) {
+                case PENDING -> throw new IllegalArgumentException("You already have a pending request for this pool");
+                case APPROVED -> throw new IllegalArgumentException("You are already a member of this pool");
+                case REJECTED -> {
+                    // Permite re-solicitar após rejeição
+                    existing.setStatus(PoolMembershipStatus.PENDING);
+                    existing.setRequestedAt(OffsetDateTime.now());
+                    existing.setApprovedAt(null);
+                    PoolMembershipEntity updated = poolMembershipRepository.save(existing);
+                    return poolMembershipMapper.toDTO(updated);
+                }
+            }
         }
 
         PoolMembershipEntity membership = new PoolMembershipEntity();
@@ -188,8 +202,7 @@ public class PoolService {
 
     @Transactional(readOnly = true)
     public List<PoolMembershipDTO> getPoolMembers(String poolId) {
-        return poolMembershipRepository.findByPoolId(poolId).stream()
-                .filter(m -> m.getStatus().equals(PoolMembershipStatus.APPROVED))
+        return poolMembershipRepository.findByPoolIdAndStatus(poolId, PoolMembershipStatus.APPROVED).stream()
                 .map(poolMembershipMapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -220,6 +233,36 @@ public class PoolService {
         PoolEntity pool = poolRepository.findById(poolId)
                 .orElseThrow(() -> new IllegalArgumentException("Pool not found"));
         return poolMapper.toDTO(pool);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PoolDTO> getPoolsWhereUserIsMember(String userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return poolMembershipRepository.findByUserIdAndStatus(userId, PoolMembershipStatus.APPROVED).stream()
+                .map(m -> poolMapper.toDTO(m.getPool()))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PoolMembershipDTO> getMembersFromPoolsWhereUserIsMemberButNotOwner(String userId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Set<String> poolIds = poolMembershipRepository.findByUserIdAndStatus(userId, PoolMembershipStatus.APPROVED).stream()
+                .filter(membership -> membership.getPool() != null
+                        && membership.getPool().getOwner() != null
+                        && !membership.getPool().getOwner().getId().equals(userId))
+                .map(membership -> membership.getPool().getId())
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        return poolIds.stream()
+                .flatMap(poolId -> poolMembershipRepository
+                        .findByPoolIdAndStatus(poolId, PoolMembershipStatus.APPROVED)
+                        .stream())
+                .map(poolMembershipMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
 

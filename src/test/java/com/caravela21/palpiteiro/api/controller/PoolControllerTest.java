@@ -3,6 +3,8 @@ package com.caravela21.palpiteiro.api.controller;
 import com.caravela21.palpiteiro.api.controller.dto.ApproveMembershipDTO;
 import com.caravela21.palpiteiro.api.controller.dto.JoinPoolDTO;
 import com.caravela21.palpiteiro.api.controller.dto.PoolDTO;
+import com.caravela21.palpiteiro.api.controller.dto.PoolMembershipDTO;
+import com.caravela21.palpiteiro.api.enums.PoolMembershipStatus;
 import com.caravela21.palpiteiro.api.service.PoolService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,6 +35,28 @@ class PoolControllerTest {
     private PoolService poolService;
 
     // ============= CREATE POOL - SUCCESS TEST =============
+
+    @Test
+    @DisplayName("Get members from pools where user is member but not owner - should return 200")
+    void getMembersFromPoolsWhereUserIsMemberButNotOwner_ReturnsOk() throws Exception {
+        // Arrange
+        var response = new PoolMembershipDTO(
+                "membership-1",
+                "pool-1",
+                "user-1",
+                "User One",
+                PoolMembershipStatus.APPROVED,
+                null,
+                null
+        );
+        when(poolService.getMembersFromPoolsWhereUserIsMemberButNotOwner("user-123")).thenReturn(java.util.List.of(response));
+
+        // Act + Assert
+        mockMvc.perform(get("/pool/member-of/user-123/members"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].poolId").value("pool-1"))
+                .andExpect(jsonPath("$[0].userId").value("user-1"));
+    }
 
     @Test
     @DisplayName("Create pool with valid data - should return 201")

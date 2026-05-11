@@ -188,6 +188,34 @@ public class PoolController {
     }
 
     @Operation(
+            summary = "Get pools where user is a member",
+            description = "Returns all pools where the user has an approved membership."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of pools the user is a member of"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping("/member-of/{userId}")
+    public ResponseEntity<List<PoolDTO>> getPoolsWhereUserIsMember(@PathVariable String userId) {
+        List<PoolDTO> pools = poolService.getPoolsWhereUserIsMember(userId);
+        return ResponseEntity.ok().body(pools);
+    }
+
+    @Operation(
+            summary = "Get members of pools where user is member (not owner)",
+            description = "Returns approved members from pools where the user participates but is not the owner."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of approved members from non-owned pools"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping("/member-of/{userId}/members")
+    public ResponseEntity<List<PoolMembershipDTO>> getMembersFromPoolsWhereUserIsMemberButNotOwner(@PathVariable String userId) {
+        List<PoolMembershipDTO> members = poolService.getMembersFromPoolsWhereUserIsMemberButNotOwner(userId);
+        return ResponseEntity.ok().body(members);
+    }
+
+    @Operation(
             summary = "Get pool details",
             description = "Retrieves the details of a specific pool."
     )

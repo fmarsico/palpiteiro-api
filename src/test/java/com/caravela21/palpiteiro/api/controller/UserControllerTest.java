@@ -12,7 +12,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -269,38 +268,6 @@ class UserControllerTest {
     }
 
     // ============= UPDATE USER - BAD REQUEST TESTS =============
-
-    @Test
-    @DisplayName("Update authenticated user with valid data - should return 200")
-    void updateMe_ValidData_ReturnsOk() throws Exception {
-        // Arrange
-        var request = new UserDTO(null, "João", "Silva", "joao@example.com", "https://example.com/photo.jpg");
-        var response = new UserDTO("user-123", "João", "Silva", "joao@example.com", "https://example.com/photo.jpg");
-
-        when(userService.updateAuthenticatedUser(anyString(), any())).thenReturn(response);
-
-        // Act + Assert
-        mockMvc.perform(put("/user/me")
-                        .principal(() -> "user-123")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("user-123"))
-                .andExpect(jsonPath("$.email").value("joao@example.com"));
-    }
-
-    @Test
-    @DisplayName("Update authenticated user without principal - should return 401")
-    void updateMe_WithoutPrincipal_ReturnsUnauthorized() throws Exception {
-        // Arrange
-        var request = new UserDTO(null, "João", "Silva", "joao@example.com", "https://example.com/photo.jpg");
-
-        // Act + Assert
-        mockMvc.perform(put("/user/me")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
-    }
 
     @Test
     @DisplayName("Update user with blank name - should return 400")

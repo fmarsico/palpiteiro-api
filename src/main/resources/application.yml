@@ -25,7 +25,5 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 jwt:
-  # 32+ chars for HS256
   secret: palpiteiro-dev-secret-key-change-me-please-2026
   expiration-ms: 86400000
-
