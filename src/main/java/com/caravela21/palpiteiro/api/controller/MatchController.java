@@ -23,7 +23,7 @@ public class MatchController {
 
     @Operation(
             summary = "Create a new match",
-            description = "Creates a new match using homeTeamId, awayTeamId, date in ISO-8601 with offset and phase (GROUP_STAGE, SECOND_ROUND, ROUND_OF_16, QUARTER_FINAL, SEMI_FINAL, FINAL)."
+            description = "Creates a new match using homeTeamId, awayTeamId, date in ISO-8601 with offset, phase (GROUP_STAGE, SECOND_ROUND, ROUND_OF_16, QUARTER_FINAL, SEMI_FINAL, THIRD_PLACE, FINAL) and optional groupCode for group-stage games."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Match successfully created"),

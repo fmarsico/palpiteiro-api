@@ -35,13 +35,16 @@ public class WorldCupDataInitializer implements ApplicationRunner {
 
     private final TeamRepository teamRepository;
     private final MatchRepository matchRepository;
+    private Map<String, String> groupByTeamId = new HashMap<>();
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
         log.info("Checking FIFA World Cup 2026 seed data...");
         Map<String, TeamEntity> teams = createOrLoadTeams();
+        this.groupByTeamId = buildGroupByTeamId(teams);
         createMissingMatches(teams);
+        ensureGroupStageMatchGroupCodes();
         seedSampleResultsIfMissing();
         ensureDenmarkVsUzbekistanShowcaseResult();
         log.info("FIFA World Cup 2026 seed check completed. {} teams, {} matches.",
@@ -173,6 +176,37 @@ public class WorldCupDataInitializer implements ApplicationRunner {
         createRandomKnockoutMatches(teams);
     }
 
+    private Map<String, String> buildGroupByTeamId(Map<String, TeamEntity> teamsByCode) {
+        Map<String, String> map = new HashMap<>();
+        registerGroup(map, teamsByCode, "A", "USA", "PAN", "MAR", "URU");
+        registerGroup(map, teamsByCode, "B", "MEX", "JAM", "COL", "SAU");
+        registerGroup(map, teamsByCode, "C", "CAN", "ECU", "KOR", "CIV");
+        registerGroup(map, teamsByCode, "D", "ARG", "CHI", "NGA", "CRO");
+        registerGroup(map, teamsByCode, "E", "BRA", "BOL", "JPN", "SUI");
+        registerGroup(map, teamsByCode, "F", "FRA", "VEN", "CMR", "BEL");
+        registerGroup(map, teamsByCode, "G", "ESP", "HON", "AUS", "SRB");
+        registerGroup(map, teamsByCode, "H", "GER", "CRC", "POL", "SEN");
+        registerGroup(map, teamsByCode, "I", "POR", "PER", "GHA", "AUT");
+        registerGroup(map, teamsByCode, "J", "ENG", "DEN", "TUR", "UZB");
+        registerGroup(map, teamsByCode, "K", "NED", "TRI", "UKR", "EGY");
+        registerGroup(map, teamsByCode, "L", "ITA", "SLV", "ALG", "TUN");
+        return map;
+    }
+
+    private void registerGroup(
+            Map<String, String> map,
+            Map<String, TeamEntity> teamsByCode,
+            String groupCode,
+            String... teamCodes
+    ) {
+        for (String teamCode : teamCodes) {
+            TeamEntity team = teamsByCode.get(teamCode);
+            if (team != null && team.getId() != null) {
+                map.put(team.getId(), groupCode);
+            }
+        }
+    }
+
     // ─── helper para criar jogo ───────────────────────────────────────────────
 
     private void match(TeamEntity home, TeamEntity away, OffsetDateTime date) {
@@ -185,7 +219,48 @@ public class WorldCupDataInitializer implements ApplicationRunner {
         m.setAwayTeam(away);
         m.setDate(date);
         m.setPhase(phase);
+        if (phase == MatchPhase.GROUP_STAGE) {
+            m.setGroupCode(resolveGroupCode(home, away));
+        }
         matchRepository.save(m);
+    }
+
+    private String resolveGroupCode(TeamEntity home, TeamEntity away) {
+        if (home == null || home.getId() == null || away == null || away.getId() == null) {
+            return null;
+        }
+
+        String homeGroup = groupByTeamId.get(home.getId());
+        String awayGroup = groupByTeamId.get(away.getId());
+        if (homeGroup == null) {
+            return awayGroup;
+        }
+        if (awayGroup == null) {
+            return homeGroup;
+        }
+        return homeGroup.equals(awayGroup) ? homeGroup : null;
+    }
+
+    private void ensureGroupStageMatchGroupCodes() {
+        List<MatchEntity> groupStageMatches = matchRepository.findByPhase(MatchPhase.GROUP_STAGE);
+        List<MatchEntity> toUpdate = new ArrayList<>();
+
+        for (MatchEntity match : groupStageMatches) {
+            if (match.getGroupCode() != null && !match.getGroupCode().isBlank()) {
+                continue;
+            }
+
+            String groupCode = resolveGroupCode(match.getHomeTeam(), match.getAwayTeam());
+            if (groupCode != null) {
+                match.setGroupCode(groupCode);
+                toUpdate.add(match);
+            }
+        }
+
+        if (!toUpdate.isEmpty()) {
+            matchRepository.saveAll(toUpdate);
+            log.info("Backfilled group code for {} existing group-stage matches.", toUpdate.size());
+        }
     }
 
     private OffsetDateTime dt(int day, int month, int hour) {

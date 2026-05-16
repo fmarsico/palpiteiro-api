@@ -58,6 +58,7 @@ public class MatchService {
         existing.setAwayTeam(awayTeam);
         existing.setDate(matchDTO.date());
         existing.setPhase(matchDTO.phase());
+        existing.setGroupCode(matchDTO.groupCode());
 
         if (matchDTO.result() != null) {
             existing.setResult(matchMapper.toEmbeddable(matchDTO.result()));

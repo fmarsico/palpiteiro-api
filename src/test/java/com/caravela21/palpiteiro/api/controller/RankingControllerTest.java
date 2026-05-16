@@ -1,12 +1,10 @@
 package com.caravela21.palpiteiro.api.controller;
 
 import com.caravela21.palpiteiro.api.controller.dto.PoolRankingEntryDTO;
-import com.caravela21.palpiteiro.api.infrastructure.config.JwtAuthFilter;
 import com.caravela21.palpiteiro.api.service.RankingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RankingController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class RankingControllerTest {
 
     @Autowired
@@ -28,9 +25,6 @@ class RankingControllerTest {
 
     @MockitoBean
     private RankingService rankingService;
-
-    @MockitoBean
-    private JwtAuthFilter jwtAuthFilter;
 
     // ============= GET POOL RANKING - SUCCESS TESTS =============
 

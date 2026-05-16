@@ -30,11 +30,15 @@ public record MatchDTO(
                         "ROUND_OF_16",
                         "QUARTER_FINAL",
                         "SEMI_FINAL",
+                        "THIRD_PLACE",
                         "FINAL"
                 }
         )
         @NotNull(message = "Match phase is mandatory")
         MatchPhase phase,
+
+        @Schema(description = "Group code for group-stage matches", example = "A")
+        String groupCode,
 
         @Valid
         MatchResultDTO result,

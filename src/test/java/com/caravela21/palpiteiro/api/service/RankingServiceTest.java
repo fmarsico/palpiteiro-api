@@ -176,4 +176,3 @@ class RankingServiceTest {
         return prediction;
     }
 }
-

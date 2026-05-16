@@ -31,6 +31,9 @@ public class MatchEntity {
     @Column(nullable = false, length = 30)
     private MatchPhase phase;
 
+    @Column(name = "group_code", length = 2)
+    private String groupCode;
+
     @Embedded
     private MatchResultEmbeddable result;
 

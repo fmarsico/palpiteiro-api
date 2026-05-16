@@ -46,8 +46,8 @@ class MatchControllerTest {
         ));
 
         var responseList = List.of(
-                new MatchDTO("match-1", "team-a", "team-b", OffsetDateTime.parse("2026-06-11T12:00:00Z"), MatchPhase.GROUP_STAGE, new MatchResultDTO(2, 1), null, null),
-                new MatchDTO("match-2", "team-c", "team-d", OffsetDateTime.parse("2026-06-11T15:00:00Z"), MatchPhase.GROUP_STAGE, new MatchResultDTO(0, 0), null, null)
+                new MatchDTO("match-1", "team-a", "team-b", OffsetDateTime.parse("2026-06-11T12:00:00Z"), MatchPhase.GROUP_STAGE, "A", new MatchResultDTO(2, 1), null, null),
+                new MatchDTO("match-2", "team-c", "team-d", OffsetDateTime.parse("2026-06-11T15:00:00Z"), MatchPhase.GROUP_STAGE, "B", new MatchResultDTO(0, 0), null, null)
         );
 
         when(matchService.updateMatchResults(any())).thenReturn(responseList);
@@ -92,6 +92,7 @@ class MatchControllerTest {
                 MatchPhase.GROUP_STAGE,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -112,6 +113,7 @@ class MatchControllerTest {
                 "",
                 OffsetDateTime.parse("2026-06-11T12:00:00Z"),
                 MatchPhase.GROUP_STAGE,
+                null,
                 null,
                 null,
                 null
@@ -174,6 +176,7 @@ class MatchControllerTest {
                 "team-b",
                 OffsetDateTime.parse("2026-06-11T12:00:00Z"),
                 MatchPhase.GROUP_STAGE,
+                null,
                 null,
                 null,
                 null
