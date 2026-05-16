@@ -25,7 +25,9 @@ public class RankingController {
 
     @Operation(
             summary = "Get pool ranking",
-            description = "Returns ranking by total points and tie-breakers (exact total, exact group stage, exact knockout)."
+            description = "Returns the pool ranking already ordered for client consumption. " +
+                    "Sorting rules: totalPoints DESC, exactHitsTotal DESC, exactHitsGroupStage DESC, " +
+                    "exactHitsKnockout DESC, and finally name ASC as the last tie-breaker."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Ranking returned successfully"),

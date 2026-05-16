@@ -2,8 +2,10 @@ package com.caravela21.palpiteiro.api.controller;
 
 import com.caravela21.palpiteiro.api.controller.dto.ApproveMembershipDTO;
 import com.caravela21.palpiteiro.api.controller.dto.JoinPoolDTO;
+import com.caravela21.palpiteiro.api.controller.dto.PredictionItemDTO;
 import com.caravela21.palpiteiro.api.controller.dto.PoolDTO;
 import com.caravela21.palpiteiro.api.controller.dto.PoolMembershipDTO;
+import com.caravela21.palpiteiro.api.service.PredictionService;
 import com.caravela21.palpiteiro.api.service.PoolService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.List;
 public class PoolController {
 
     private final PoolService poolService;
+    private final PredictionService predictionService;
 
     @Operation(
             summary = "Create a new pool",
@@ -166,6 +170,27 @@ public class PoolController {
     public ResponseEntity<List<PoolMembershipDTO>> getPoolMembers(@PathVariable String poolId) {
         List<PoolMembershipDTO> members = poolService.getPoolMembers(poolId);
         return ResponseEntity.ok().body(members);
+    }
+
+    @Operation(
+            summary = "Get authenticated user's predictions in a pool",
+            description = "Returns the predictions created by the authenticated user for the given pool."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of predictions returned successfully"),
+            @ApiResponse(responseCode = "400", description = "User is not an approved member of the pool"),
+            @ApiResponse(responseCode = "404", description = "User or pool not found")
+    })
+    @GetMapping("/{poolId}/predictions/me")
+    public ResponseEntity<List<PredictionItemDTO>> getMyPredictionsInPool(
+            @PathVariable String poolId,
+            Authentication authentication) {
+        if (authentication == null || authentication.getName() == null || authentication.getName().isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        List<PredictionItemDTO> predictions = predictionService.getPredictionsForUserInPool(authentication.getName(), poolId);
+        return ResponseEntity.ok().body(predictions);
     }
 
     @Operation(

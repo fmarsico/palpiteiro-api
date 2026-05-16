@@ -20,7 +20,10 @@ public record PredictionItemDTO(
 
 		@PositiveOrZero(message = "Away score must be zero or greater")
 		@Max(value = 20, message = "Away score must be 20 or less")
-		int awayScore
+		int awayScore,
+
+		@Schema(accessMode = Schema.AccessMode.READ_ONLY)
+		Integer points
 ) {
 }
 

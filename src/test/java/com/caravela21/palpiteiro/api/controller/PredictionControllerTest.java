@@ -40,11 +40,11 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         when(predictionService.createPredictions(any())).thenReturn(
-                List.of(new PredictionItemDTO("pred-1", "match-123", 2, 1))
+                List.of(new PredictionItemDTO("pred-1", "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -65,11 +65,11 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 1, 0))
+                List.of(new PredictionItemDTO(null, "match-123", 1, 0, null))
         );
 
         when(predictionService.updatePredictions(any())).thenReturn(
-                List.of(new PredictionItemDTO("pred-1", "match-123", 1, 0))
+                List.of(new PredictionItemDTO("pred-1", "match-123", 1, 0, null))
         );
 
         // Act + Assert
@@ -102,7 +102,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -133,7 +133,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 longUserId,
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -150,7 +150,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "",
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -168,7 +168,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 longPoolId,
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -185,7 +185,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "", 2, 1))
+                List.of(new PredictionItemDTO(null, "", 2, 1, null))
         );
 
         // Act + Assert
@@ -203,7 +203,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, longMatchId, 2, 1))
+                List.of(new PredictionItemDTO(null, longMatchId, 2, 1, null))
         );
 
         // Act + Assert
@@ -272,7 +272,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 1, 0))
+                List.of(new PredictionItemDTO(null, "match-123", 1, 0, null))
         );
 
         // Act + Assert
@@ -315,11 +315,11 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 0, 0))
+                List.of(new PredictionItemDTO(null, "match-123", 0, 0, null))
         );
 
         when(predictionService.createPredictions(any())).thenReturn(
-                List.of(new PredictionItemDTO("pred-1", "match-123", 0, 0))
+                List.of(new PredictionItemDTO("pred-1", "match-123", 0, 0, null))
         );
 
         // Act + Assert
@@ -336,11 +336,11 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 20, 20))
+                List.of(new PredictionItemDTO(null, "match-123", 20, 20, null))
         );
 
         when(predictionService.createPredictions(any())).thenReturn(
-                List.of(new PredictionItemDTO("pred-1", "match-123", 20, 20))
+                List.of(new PredictionItemDTO("pred-1", "match-123", 20, 20, null))
         );
 
         // Act + Assert
@@ -385,7 +385,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "   ", 1, 0))
+                List.of(new PredictionItemDTO(null, "   ", 1, 0, null))
         );
 
         // Act + Assert
@@ -402,7 +402,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "   ",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -419,7 +419,7 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "   ",
-                List.of(new PredictionItemDTO(null, "match-123", 2, 1))
+                List.of(new PredictionItemDTO(null, "match-123", 2, 1, null))
         );
 
         // Act + Assert
@@ -436,11 +436,11 @@ class PredictionControllerTest {
         var request = new PredictionBatchDTO(
                 "user-123",
                 "pool-123",
-                List.of(new PredictionItemDTO(null, "match-123", 20, 20))
+                List.of(new PredictionItemDTO(null, "match-123", 20, 20, null))
         );
 
         when(predictionService.updatePredictions(any())).thenReturn(
-                List.of(new PredictionItemDTO("pred-1", "match-123", 20, 20))
+                List.of(new PredictionItemDTO("pred-1", "match-123", 20, 20, null))
         );
 
         // Act + Assert

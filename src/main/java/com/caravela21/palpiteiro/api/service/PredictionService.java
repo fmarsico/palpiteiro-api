@@ -5,6 +5,7 @@ import com.caravela21.palpiteiro.api.controller.dto.PredictionItemDTO;
 import com.caravela21.palpiteiro.api.enums.PoolMembershipStatus;
 import com.caravela21.palpiteiro.api.exceptions.PredictionDeadlineExceededException;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
+import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchResultEmbeddable;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PoolEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.PredictionEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.UserEntity;
@@ -31,6 +32,7 @@ public class PredictionService {
     private final PoolRepository poolRepository;
     private final MatchRepository matchRepository;
     private final PoolMembershipRepository poolMembershipRepository;
+    private final ScoringService scoringService;
 
     /**
      * Cria uma lista de palpites em uma única transação.
@@ -61,6 +63,19 @@ public class PredictionService {
 
         return batchDTO.predictions().stream()
                 .map(item -> updateSingle(user, pool, item))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PredictionItemDTO> getPredictionsForUserInPool(String userId, String poolId) {
+        UserEntity user = findUser(userId);
+        PoolEntity pool = findPool(poolId);
+
+        validatePoolMembership(user, pool);
+
+        return predictionRepository.findByUserIdAndPoolId(user.getId(), pool.getId()).stream()
+                .sorted(Comparator.comparing(prediction -> prediction.getMatch().getDate()))
+                .map(this::toItemDTO)
                 .toList();
     }
 
@@ -142,11 +157,28 @@ public class PredictionService {
     }
 
     private PredictionItemDTO toItemDTO(PredictionEntity entity) {
+        Integer points = calculatePointsIfMatchHasResult(entity);
+
         return new PredictionItemDTO(
                 entity.getId(),
                 entity.getMatch().getId(),
                 entity.getHomeScore(),
-                entity.getAwayScore()
+                entity.getAwayScore(),
+                points
+        );
+    }
+
+    private Integer calculatePointsIfMatchHasResult(PredictionEntity entity) {
+        MatchResultEmbeddable result = entity.getMatch() != null ? entity.getMatch().getResult() : null;
+        if (result == null) {
+            return 0;
+        }
+
+        return scoringService.calculatePoints(
+                entity.getHomeScore(),
+                entity.getAwayScore(),
+                result.getHomeScore(),
+                result.getAwayScore()
         );
     }
 }

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +33,16 @@ public class RankingService {
     private final PoolMembershipRepository poolMembershipRepository;
     private final ScoringService scoringService;
 
+    private static final Comparator<RankingAccumulator> RANKING_ORDER =
+            Comparator.comparingInt((RankingAccumulator r) -> r.totalPoints).reversed()
+                    .thenComparing(Comparator.comparingInt((RankingAccumulator r) -> r.exactHitsTotal).reversed())
+                    .thenComparing(Comparator.comparingInt((RankingAccumulator r) -> r.exactHitsGroupStage).reversed())
+                    .thenComparing(Comparator.comparingInt((RankingAccumulator r) -> r.exactHitsKnockout).reversed())
+                    .thenComparing(
+                            r -> buildDisplayName(r.user),
+                            Comparator.nullsLast(String::compareToIgnoreCase)
+                    );
+
     @Transactional(readOnly = true)
     public List<PoolRankingEntryDTO> getPoolRanking(String poolId) {
         PoolEntity pool = poolRepository.findById(poolId)
@@ -48,7 +57,7 @@ public class RankingService {
         List<PoolMembershipEntity> approvedMembers = poolMembershipRepository.findByPoolId(poolId)
                 .stream()
                 .filter(m -> m.getStatus().equals(PoolMembershipStatus.APPROVED))
-                .collect(Collectors.toList());
+                .toList();
 
         for (PoolMembershipEntity membership : approvedMembers) {
             addUserToRankingMap(rankingMap, membership.getUser());
@@ -92,13 +101,7 @@ public class RankingService {
         }
 
         List<RankingAccumulator> ordered = new ArrayList<>(rankingMap.values());
-        ordered.sort(
-                Comparator.comparingInt((RankingAccumulator r) -> r.totalPoints).reversed()
-                        .thenComparingInt((RankingAccumulator r) -> r.exactHitsTotal).reversed()
-                        .thenComparingInt((RankingAccumulator r) -> r.exactHitsGroupStage).reversed()
-                        .thenComparingInt((RankingAccumulator r) -> r.exactHitsKnockout).reversed()
-                        .thenComparing(r -> r.user.getName(), Comparator.nullsLast(String::compareToIgnoreCase))
-        );
+        ordered.sort(RANKING_ORDER);
 
         List<PoolRankingEntryDTO> ranking = new ArrayList<>();
         int position = 1;
@@ -124,7 +127,7 @@ public class RankingService {
         rankingMap.put(user.getId(), new RankingAccumulator(user));
     }
 
-    private String buildDisplayName(UserEntity user) {
+    private static String buildDisplayName(UserEntity user) {
         if (user.getLastname() == null || user.getLastname().isBlank()) {
             return user.getName();
         }

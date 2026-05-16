@@ -2,6 +2,7 @@ package com.caravela21.palpiteiro.api.infrastructure.initializer;
 
 import com.caravela21.palpiteiro.api.enums.MatchPhase;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchEntity;
+import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.MatchResultEmbeddable;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.entity.TeamEntity;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.MatchRepository;
 import com.caravela21.palpiteiro.api.infrastructure.persistence.repository.TeamRepository;
@@ -14,8 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Initializes the database with the FIFA World Cup 2026 group stage teams and matches.
@@ -32,15 +39,12 @@ public class WorldCupDataInitializer implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (teamRepository.count() > 0) {
-            log.info("Teams already initialized, skipping World Cup data initialization.");
-            return;
-        }
-
-        log.info("Initializing FIFA World Cup 2026 group stage data...");
-        Map<String, TeamEntity> teams = createTeams();
-        createGroupStageMatches(teams);
-        log.info("FIFA World Cup 2026 group stage data initialized successfully. {} teams, {} matches.",
+        log.info("Checking FIFA World Cup 2026 seed data...");
+        Map<String, TeamEntity> teams = createOrLoadTeams();
+        createMissingMatches(teams);
+        seedSampleResultsIfMissing();
+        ensureDenmarkVsUzbekistanShowcaseResult();
+        log.info("FIFA World Cup 2026 seed check completed. {} teams, {} matches.",
                 teamRepository.count(), matchRepository.count());
     }
 
@@ -53,92 +57,134 @@ public class WorldCupDataInitializer implements ApplicationRunner {
         return teamRepository.save(t);
     }
 
-    private Map<String, TeamEntity> createTeams() {
+    private Map<String, TeamEntity> createOrLoadTeams() {
         Map<String, TeamEntity> t = new HashMap<>();
+        Map<String, TeamEntity> existingByName = teamRepository.findAll().stream()
+                .collect(Collectors.toMap(
+                        team -> normalizeName(team.getName()),
+                        team -> team,
+                        (a, b) -> a
+                ));
 
         // Group A
-        t.put("USA",       team("Estados Unidos", "us"));
-        t.put("PAN",       team("Panamá", "pa"));
-        t.put("MAR",       team("Marrocos", "ma"));
-        t.put("URU",       team("Uruguai", "uy"));
+        putTeam(t, existingByName, "USA", "Estados Unidos", "us");
+        putTeam(t, existingByName, "PAN", "Panamá", "pa");
+        putTeam(t, existingByName, "MAR", "Marrocos", "ma");
+        putTeam(t, existingByName, "URU", "Uruguai", "uy");
 
         // Group B
-        t.put("MEX",       team("México", "mx"));
-        t.put("JAM",       team("Jamaica", "jm"));
-        t.put("COL",       team("Colômbia", "co"));
-        t.put("SAU",       team("Arábia Saudita", "sa"));
+        putTeam(t, existingByName, "MEX", "México", "mx");
+        putTeam(t, existingByName, "JAM", "Jamaica", "jm");
+        putTeam(t, existingByName, "COL", "Colômbia", "co");
+        putTeam(t, existingByName, "SAU", "Arábia Saudita", "sa");
 
         // Group C
-        t.put("CAN",       team("Canadá", "ca"));
-        t.put("ECU",       team("Equador", "ec"));
-        t.put("KOR",       team("Coreia do Sul", "kr"));
-        t.put("CIV",       team("Costa do Marfim", "ci"));
+        putTeam(t, existingByName, "CAN", "Canadá", "ca");
+        putTeam(t, existingByName, "ECU", "Equador", "ec");
+        putTeam(t, existingByName, "KOR", "Coreia do Sul", "kr");
+        putTeam(t, existingByName, "CIV", "Costa do Marfim", "ci");
 
         // Group D
-        t.put("ARG",       team("Argentina", "ar"));
-        t.put("CHI",       team("Chile", "cl"));
-        t.put("NGA",       team("Nigéria", "ng"));
-        t.put("CRO",       team("Croácia", "hr"));
+        putTeam(t, existingByName, "ARG", "Argentina", "ar");
+        putTeam(t, existingByName, "CHI", "Chile", "cl");
+        putTeam(t, existingByName, "NGA", "Nigéria", "ng");
+        putTeam(t, existingByName, "CRO", "Croácia", "hr");
 
         // Group E
-        t.put("BRA",       team("Brasil", "br"));
-        t.put("BOL",       team("Bolívia", "bo"));
-        t.put("JPN",       team("Japão", "jp"));
-        t.put("SUI",       team("Suíça", "ch"));
+        putTeam(t, existingByName, "BRA", "Brasil", "br");
+        putTeam(t, existingByName, "BOL", "Bolívia", "bo");
+        putTeam(t, existingByName, "JPN", "Japão", "jp");
+        putTeam(t, existingByName, "SUI", "Suíça", "ch");
 
         // Group F
-        t.put("FRA",       team("França", "fr"));
-        t.put("VEN",       team("Venezuela", "ve"));
-        t.put("CMR",       team("Camarões", "cm"));
-        t.put("BEL",       team("Bélgica", "be"));
+        putTeam(t, existingByName, "FRA", "França", "fr");
+        putTeam(t, existingByName, "VEN", "Venezuela", "ve");
+        putTeam(t, existingByName, "CMR", "Camarões", "cm");
+        putTeam(t, existingByName, "BEL", "Bélgica", "be");
 
         // Group G
-        t.put("ESP",       team("Espanha", "es"));
-        t.put("HON",       team("Honduras", "hn"));
-        t.put("AUS",       team("Austrália", "au"));
-        t.put("SRB",       team("Sérvia", "rs"));
+        putTeam(t, existingByName, "ESP", "Espanha", "es");
+        putTeam(t, existingByName, "HON", "Honduras", "hn");
+        putTeam(t, existingByName, "AUS", "Austrália", "au");
+        putTeam(t, existingByName, "SRB", "Sérvia", "rs");
 
         // Group H
-        t.put("GER",       team("Alemanha", "de"));
-        t.put("CRC",       team("Costa Rica", "cr"));
-        t.put("POL",       team("Polônia", "pl"));
-        t.put("SEN",       team("Senegal", "sn"));
+        putTeam(t, existingByName, "GER", "Alemanha", "de");
+        putTeam(t, existingByName, "CRC", "Costa Rica", "cr");
+        putTeam(t, existingByName, "POL", "Polônia", "pl");
+        putTeam(t, existingByName, "SEN", "Senegal", "sn");
 
         // Group I
-        t.put("POR",       team("Portugal", "pt"));
-        t.put("PER",       team("Peru", "pe"));
-        t.put("GHA",       team("Gana", "gh"));
-        t.put("AUT",       team("Áustria", "at"));
+        putTeam(t, existingByName, "POR", "Portugal", "pt");
+        putTeam(t, existingByName, "PER", "Peru", "pe");
+        putTeam(t, existingByName, "GHA", "Gana", "gh");
+        putTeam(t, existingByName, "AUT", "Áustria", "at");
 
         // Group J
-        t.put("ENG",       team("Inglaterra", "gb-eng"));
-        t.put("DEN",       team("Dinamarca", "dk"));
-        t.put("TUR",       team("Turquia", "tr"));
-        t.put("UZB",       team("Uzbequistão", "uz"));
+        putTeam(t, existingByName, "ENG", "Inglaterra", "gb-eng");
+        putTeam(t, existingByName, "DEN", "Dinamarca", "dk");
+        putTeam(t, existingByName, "TUR", "Turquia", "tr");
+        putTeam(t, existingByName, "UZB", "Uzbequistão", "uz");
 
         // Group K
-        t.put("NED",       team("Países Baixos", "nl"));
-        t.put("TRI",       team("Trinidad e Tobago", "tt"));
-        t.put("UKR",       team("Ucrânia", "ua"));
-        t.put("EGY",       team("Egito", "eg"));
+        putTeam(t, existingByName, "NED", "Países Baixos", "nl");
+        putTeam(t, existingByName, "TRI", "Trinidad e Tobago", "tt");
+        putTeam(t, existingByName, "UKR", "Ucrânia", "ua");
+        putTeam(t, existingByName, "EGY", "Egito", "eg");
 
         // Group L
-        t.put("ITA",       team("Itália", "it"));
-        t.put("SLV",       team("El Salvador", "sv"));
-        t.put("ALG",       team("Argélia", "dz"));
-        t.put("TUN",       team("Tunísia", "tn"));
+        putTeam(t, existingByName, "ITA", "Itália", "it");
+        putTeam(t, existingByName, "SLV", "El Salvador", "sv");
+        putTeam(t, existingByName, "ALG", "Argélia", "dz");
+        putTeam(t, existingByName, "TUN", "Tunísia", "tn");
 
         return t;
+    }
+
+    private void putTeam(
+            Map<String, TeamEntity> teamsByCode,
+            Map<String, TeamEntity> existingByName,
+            String code,
+            String name,
+            String countryCode
+    ) {
+        String normalizedName = normalizeName(name);
+        TeamEntity existing = existingByName.get(normalizedName);
+
+        if (existing == null) {
+            existing = team(name, countryCode);
+            existingByName.put(normalizedName, existing);
+        }
+
+        teamsByCode.put(code, existing);
+    }
+
+    private String normalizeName(String value) {
+        return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private void createMissingMatches(Map<String, TeamEntity> teams) {
+        if (matchRepository.findByPhase(MatchPhase.GROUP_STAGE).isEmpty()) {
+            createGroupStageMatches(teams);
+        } else {
+            log.info("Group stage matches already exist, skipping GROUP_STAGE seed.");
+        }
+
+        createRandomKnockoutMatches(teams);
     }
 
     // ─── helper para criar jogo ───────────────────────────────────────────────
 
     private void match(TeamEntity home, TeamEntity away, OffsetDateTime date) {
+        match(home, away, date, MatchPhase.GROUP_STAGE);
+    }
+
+    private void match(TeamEntity home, TeamEntity away, OffsetDateTime date, MatchPhase phase) {
         MatchEntity m = new MatchEntity();
         m.setHomeTeam(home);
         m.setAwayTeam(away);
         m.setDate(date);
-        m.setPhase(MatchPhase.GROUP_STAGE);
+        m.setPhase(phase);
         matchRepository.save(m);
     }
 
@@ -249,6 +295,112 @@ public class WorldCupDataInitializer implements ApplicationRunner {
         match(t.get("SLV"), t.get("TUN"), dt(21, 6, 12));
         match(t.get("ITA"), t.get("TUN"), dt(27, 6, 18));
         match(t.get("SLV"), t.get("ALG"), dt(27, 6, 18));
+    }
+
+    private void createRandomKnockoutMatches(Map<String, TeamEntity> teams) {
+        List<TeamEntity> allTeams = new ArrayList<>(teams.values());
+        Random random = new Random();
+
+        createRandomMatchesForMissingPhase(allTeams, MatchPhase.SECOND_ROUND, 8, dt(29, 6, 12), random);
+        createRandomMatchesForMissingPhase(allTeams, MatchPhase.ROUND_OF_16, 8, dt(3, 7, 12), random);
+        createRandomMatchesForMissingPhase(allTeams, MatchPhase.QUARTER_FINAL, 4, dt(7, 7, 14), random);
+        createRandomMatchesForMissingPhase(allTeams, MatchPhase.SEMI_FINAL, 2, dt(10, 7, 18), random);
+        createRandomMatchesForMissingPhase(allTeams, MatchPhase.THIRD_PLACE, 1, dt(13, 7, 18), random);
+        createRandomMatchesForMissingPhase(allTeams, MatchPhase.FINAL, 1, dt(14, 7, 20), random);
+    }
+
+    private void createRandomMatchesForMissingPhase(
+            List<TeamEntity> teams,
+            MatchPhase phase,
+            int matchesCount,
+            OffsetDateTime initialDate,
+            Random random
+    ) {
+        if (!matchRepository.findByPhase(phase).isEmpty()) {
+            log.info("Matches for phase {} already exist, skipping seed for this phase.", phase);
+            return;
+        }
+
+        createRandomMatchesForPhase(teams, phase, matchesCount, initialDate, random);
+    }
+
+    private void createRandomMatchesForPhase(
+            List<TeamEntity> teams,
+            MatchPhase phase,
+            int matchesCount,
+            OffsetDateTime initialDate,
+            Random random
+    ) {
+        if (teams.size() < 2 || matchesCount <= 0) {
+            return;
+        }
+
+        List<TeamEntity> shuffled = new ArrayList<>(teams);
+        Collections.shuffle(shuffled, random);
+
+        int maxMatches = Math.min(matchesCount, shuffled.size() / 2);
+        for (int i = 0; i < maxMatches; i++) {
+            TeamEntity home = shuffled.get(i * 2);
+            TeamEntity away = shuffled.get(i * 2 + 1);
+            match(home, away, initialDate.plusHours(i * 3L), phase);
+        }
+    }
+
+    private void seedSampleResultsIfMissing() {
+        List<MatchEntity> allMatches = matchRepository.findAll();
+        if (allMatches.isEmpty()) {
+            return;
+        }
+
+        long matchesWithResult = allMatches.stream().filter(match -> match.getResult() != null).count();
+        if (matchesWithResult > 0) {
+            log.info("Sample results already initialized ({} matches), skipping one-time seed.", matchesWithResult);
+            return;
+        }
+
+        Random random = new Random();
+        List<MatchEntity> shuffled = new ArrayList<>(allMatches);
+        Collections.shuffle(shuffled, random);
+
+        int matchesToSeed = Math.max(12, (int) Math.ceil(shuffled.size() * 0.45));
+        matchesToSeed = Math.min(matchesToSeed, shuffled.size());
+
+        List<MatchEntity> toUpdate = shuffled.subList(0, matchesToSeed);
+        for (MatchEntity match : toUpdate) {
+            MatchResultEmbeddable result = new MatchResultEmbeddable();
+            result.setHomeScore(random.nextInt(5));
+            result.setAwayScore(random.nextInt(5));
+            match.setResult(result);
+        }
+
+        matchRepository.saveAll(toUpdate);
+        log.info("Seeded sample results for {} matches (one-time UI test data).", toUpdate.size());
+    }
+
+    private void ensureDenmarkVsUzbekistanShowcaseResult() {
+        List<MatchEntity> groupStageMatches = matchRepository.findByPhase(MatchPhase.GROUP_STAGE);
+
+        for (MatchEntity match : groupStageMatches) {
+            String home = normalizeName(match.getHomeTeam() != null ? match.getHomeTeam().getName() : null);
+            String away = normalizeName(match.getAwayTeam() != null ? match.getAwayTeam().getName() : null);
+
+            if ("dinamarca".equals(home) && "uzbequistão".equals(away)) {
+                MatchResultEmbeddable current = match.getResult();
+                if (current != null && current.getHomeScore() == 4 && current.getAwayScore() == 6) {
+                    return;
+                }
+
+                MatchResultEmbeddable result = new MatchResultEmbeddable();
+                result.setHomeScore(4);
+                result.setAwayScore(6);
+                match.setResult(result);
+                matchRepository.save(match);
+                log.info("Applied showcase result: Dinamarca 4 x 6 Uzbequistão.");
+                return;
+            }
+        }
+
+        log.warn("Could not find group stage match Dinamarca x Uzbequistão to apply showcase result.");
     }
 }
 
