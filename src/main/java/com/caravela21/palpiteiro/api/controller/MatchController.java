@@ -2,6 +2,12 @@ package com.caravela21.palpiteiro.api.controller;
 
 import com.caravela21.palpiteiro.api.controller.dto.MatchDTO;
 import com.caravela21.palpiteiro.api.controller.dto.MatchResultBatchDTO;
+import com.caravela21.palpiteiro.api.controller.dto.ApiFootballSyncResultDTO;
+import com.caravela21.palpiteiro.api.controller.dto.ApiFootballSyncStatusDTO;
+import com.caravela21.palpiteiro.api.infrastructure.config.ApiFootballProperties;
+import com.caravela21.palpiteiro.api.service.ApiFootballQuotaGuardService;
+import com.caravela21.palpiteiro.api.service.ApiFootballSyncService;
+import com.caravela21.palpiteiro.api.service.ApiFootballSyncStatusService;
 import com.caravela21.palpiteiro.api.service.MatchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +26,10 @@ import java.util.List;
 public class MatchController {
 
     private final MatchService matchService;
+    private final ApiFootballSyncService apiFootballSyncService;
+    private final ApiFootballSyncStatusService apiFootballSyncStatusService;
+    private final ApiFootballQuotaGuardService apiFootballQuotaGuardService;
+    private final ApiFootballProperties apiFootballProperties;
 
     @Operation(
             summary = "Create a new match",
@@ -83,5 +93,30 @@ public class MatchController {
     @GetMapping
     public ResponseEntity<List<MatchDTO>> getAllMatches() {
         return ResponseEntity.ok(matchService.findAll());
+    }
+
+    @Operation(
+            summary = "Synchronize fixtures from API-FOOTBALL",
+            description = "Imports and upserts fixtures and results from the configured API-FOOTBALL league/season into the local database."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Sync completed successfully"),
+            @ApiResponse(responseCode = "400", description = "Sync is disabled or API key is missing")
+    })
+    @PostMapping("/sync/api-football")
+    public ResponseEntity<ApiFootballSyncResultDTO> syncApiFootballFixtures() {
+        return ResponseEntity.ok(apiFootballSyncService.syncConfiguredCompetition());
+    }
+
+    @Operation(
+            summary = "Get API-FOOTBALL synchronization status",
+            description = "Returns last sync execution mode, outcome, counters and current scheduled daily quota consumption."
+    )
+    @ApiResponse(responseCode = "200", description = "Status returned successfully")
+    @GetMapping("/sync/api-football/status")
+    public ResponseEntity<ApiFootballSyncStatusDTO> getApiFootballSyncStatus() {
+        int consumedToday = apiFootballQuotaGuardService.getConsumedToday();
+        int budget = apiFootballProperties.getScheduledDailyRequestBudget();
+        return ResponseEntity.ok(apiFootballSyncStatusService.getStatus(consumedToday, budget));
     }
 }

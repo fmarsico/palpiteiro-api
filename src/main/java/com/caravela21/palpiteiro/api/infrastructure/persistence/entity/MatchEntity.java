@@ -31,6 +31,15 @@ public class MatchEntity {
     @Column(nullable = false, length = 30)
     private MatchPhase phase;
 
+    @Column(name = "external_fixture_id", unique = true)
+    private Long externalFixtureId;
+
+    @Column(name = "round_name", length = 80)
+    private String roundName;
+
+    @Column(length = 16)
+    private String status;
+
     @Column(name = "group_code", length = 2)
     private String groupCode;
 

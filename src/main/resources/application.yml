@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env[.properties],optional:file:.env.local[.properties]
   profiles:
     default: dev
   devtools:
@@ -27,3 +29,24 @@ spring:
 jwt:
   secret: palpiteiro-dev-secret-key-change-me-please-2026
   expiration-ms: 86400000
+
+app:
+  api-football:
+    enabled: true
+    import-on-startup: false
+    bootstrap-if-no-matches-on-startup: true
+    base-url: https://v3.football.api-sports.io
+    api-key: 3161869716d93b7e7431e787fee97724
+    host: v3.football.api-sports.io
+    league-id: 1
+    season: 2022
+    timezone: UTC
+    scheduled-sync-enabled: false
+    schedule-timezone: UTC
+    scheduled-cron-morning: "0 5 6 * * *"
+    scheduled-cron-afternoon: "0 5 14 * * *"
+    scheduled-cron-night: "0 5 22 * * *"
+    scheduled-daily-request-budget: 90
+    sync-past-days: 1
+    sync-future-days: 1
+

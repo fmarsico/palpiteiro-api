@@ -16,6 +16,9 @@ public class TeamEntity {
     @Column(nullable = false, unique = true, length = 80)
     private String name;
 
+    @Column(name = "external_id", unique = true)
+    private Long externalId;
+
     @Column(length = 500)
     private String flagUrl;
 }

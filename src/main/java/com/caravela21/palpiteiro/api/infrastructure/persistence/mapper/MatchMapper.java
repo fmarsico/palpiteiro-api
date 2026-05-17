@@ -14,6 +14,9 @@ public interface MatchMapper {
 
     @Mapping(target = "homeTeam", ignore = true)
     @Mapping(target = "awayTeam", ignore = true)
+    @Mapping(target = "externalFixtureId", ignore = true)
+    @Mapping(target = "roundName", ignore = true)
+    @Mapping(target = "status", ignore = true)
     MatchEntity toEntity(MatchDTO dto);
 
     @Mapping(target = "homeTeamId", source = "homeTeam.id")
